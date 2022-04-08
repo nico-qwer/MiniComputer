@@ -6,7 +6,7 @@ namespace MiniComputer
 {
     internal class Program
     {
-        static string currentDirectory = "Main/";
+        static string currentDirectory = "Home/";
         static File? openFile;
 
         static void Main(string[] args)
@@ -22,6 +22,18 @@ namespace MiniComputer
             ReadLine();
         }
 
+        public static void CreateFile(string fileName, string fileDirectory)
+        {
+            if (fileName == null || fileDirectory == null) 
+            {
+                WriteError("Cannot create file with no name"); 
+                return;
+            }
+
+            File newFile = new File(fileName, fileDirectory);
+            WriteLine("Created file " + newFile.name);
+        }
+
         public static void WriteError(string text)
         {
             ForegroundColor = ConsoleColor.Red;
@@ -34,16 +46,16 @@ namespace MiniComputer
     {
         public static List<File> files = new List<File>();
 
-        public string name;
-        public string directory;
-        public int size;
-        public string type;
+        public string name = "Unnamed";
+        public string directory = "Home/";
+        public int size = 0;
+        public string type = "txt";
 
         public File(string newName, string newDirectory)
         {
             Rename(newName);
             directory = newDirectory;
-
+            files.Add(this);
         }
 
         public void Rename(string newName) 
