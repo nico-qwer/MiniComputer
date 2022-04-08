@@ -1,0 +1,15 @@
+C:\Users\nicol\Documents\Code\MiniComputer\bin\Debug\net6.0\MiniComputer.exe
+C:\Users\nicol\Documents\Code\MiniComputer\bin\Debug\net6.0\MiniComputer.deps.json
+C:\Users\nicol\Documents\Code\MiniComputer\bin\Debug\net6.0\MiniComputer.runtimeconfig.json
+C:\Users\nicol\Documents\Code\MiniComputer\bin\Debug\net6.0\MiniComputer.dll
+C:\Users\nicol\Documents\Code\MiniComputer\bin\Debug\net6.0\ref\MiniComputer.dll
+C:\Users\nicol\Documents\Code\MiniComputer\bin\Debug\net6.0\MiniComputer.pdb
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.csproj.AssemblyReference.cache
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.AssemblyInfoInputs.cache
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.AssemblyInfo.cs
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.csproj.CoreCompileInputs.cache
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.dll
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\ref\MiniComputer.dll
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.pdb
+C:\Users\nicol\Documents\Code\MiniComputer\obj\Debug\net6.0\MiniComputer.genruntimeconfig.cache
