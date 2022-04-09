@@ -22,19 +22,58 @@ namespace MiniComputer
 
                 string command = input.Split(" ")[0];
                 string[] arguments = input.Split(" ").Skip(1).ToArray();
+                if (arguments == null) 
+                {
+                    arguments = new string[0];
+                }
+                FindCommand(command, arguments);
             }
         }
 
         public static void FindCommand(string command, string[] arguments)
         {
+            if (command == "new")
+            {
+                if (arguments[0] == null || arguments[1] == null)
+                {
+                    WriteError("101: Please write the necessary arguments.");
+                    return;
+                }
 
+                if (arguments[0].ToLower() == "dir" || arguments[0].ToLower() == "directory" )
+                {
+                    CreateDirectory(arguments[1], currentPath);
+                } 
+                else if (arguments[0].ToLower() == "file")
+                {
+                    CreateFile(arguments[1], currentPath);
+                }
+                else
+                {
+                    WriteError($"102: {arguments[0]} not recognised.");
+                }
+            }
+            else if (command == "cd")
+            {
+                if (arguments[0] == null)
+                {
+                    WriteError("101: Please write the necessary arguments.");
+                    return;
+                }
+
+                Directory[] newPath = UnFormatDirectory(arguments[0]);
+                if (newPath == null) return;
+
+                currentPath = newPath;
+                Clear();
+            }
         }
 
         public static void CreateFile(string fileName, Directory[] filePath)
         {
             if (fileName == null || filePath == null)
             {
-                WriteError("Cannot create file with no name");
+                WriteError("201: Cannot create file with no name.");
                 return;
             }
 
@@ -46,11 +85,11 @@ namespace MiniComputer
         {
             if (dirName == null|| dirName == "" || dirPath == null)
             {
-                WriteError("Cannot create directory with no name");
+                WriteError("201: Cannot create directory with no name.");
                 return;
             }
 
-            File newDir = new File(dirName, dirPath);
+            Directory newDir = new Directory(dirName, dirPath);
             WriteLine("Created directory " + newDir.name);
         }
 
@@ -63,18 +102,25 @@ namespace MiniComputer
 
         public static string FormatDirectory(Directory[] path)
         {
-            string output = "";
-            foreach (Directory directory in path)
+            string output = mainDirectory.name;
+            for(int i = 1; i < path.Length; i++) 
             {
-                output = output + "/" + directory.name;
+                output = output + "/" + path[i].name;
             }
             return output;
         }
         public static Directory[] UnFormatDirectory(string path)
         {
-            string[] splitedPath = path.Split("/");
+            string[] splitedPath = path.Split("/"); 
+            Directory[] output;
 
-            Directory[] output = Directory.Find(splitedPath);
+            if (splitedPath.Length == 1 && splitedPath[0] != mainDirectory.name)
+            {
+                output = Directory.FindChildren(splitedPath[0], currentPath);
+            } else
+            {
+                output = Directory.Find(splitedPath);
+            }
 
             return output;
         }

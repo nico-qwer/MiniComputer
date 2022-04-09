@@ -21,13 +21,13 @@ namespace MiniComputer
         {
             if (newName == null || newName == " ")
             {
-                Program.WriteError("Cannot rename to nothing");
+                Program.WriteError("201: Cannot rename to nothing.");
                 return;
             }
 
             string newExtension = newName.Split('.').Last();
 
-            if (newExtension != null)
+            if (newExtension != null && newExtension != "")
             {
                 name = newName;
                 type = newExtension;
@@ -42,7 +42,7 @@ namespace MiniComputer
         {
             if (newPath == null)
             {
-                Program.WriteError("Cannot move nowhere");
+                Program.WriteError("201: Cannot move nowhere.");
                 return;
             }
 
@@ -53,7 +53,8 @@ namespace MiniComputer
 
     class Directory
     {
-        public static Directory mainDirectory = new Directory("Main", new Directory[0]);
+        private static string rootDirName = "Main";
+        public static Directory mainDirectory = new Directory(rootDirName, new Directory[0]);
         public string name = "Unnamed";
         public Directory[]? path;
         public List<Directory> directories = new List<Directory>();
@@ -63,25 +64,59 @@ namespace MiniComputer
         {
             Rename(newName);
             path = newPath;
+            if (newName == rootDirName) return;
+            newPath.Last().directories.Add(this);
         }
 
-        public static Directory[] Find(string[] path)
+        public void DeleteDirectory(string _name, Directory[] _path)
         {
-            Directory[] output = new Directory[path.Length];
+            for (int i = 0; i < _path.Last().directories.Count(); i++)
+            {
+                if (_path.Last().directories[i].name != _name) continue;
+                _path.Last().directories.RemoveAt(i);
+                return;
+            }
+            Program.WriteError("404: No such directory exists.");
+        }
+
+        public static Directory[] Find(string[] _path)
+        {
+            Directory[] output = new Directory[_path.Length];
             output[0] = mainDirectory;
 
-            for (int i = 1; i < path.Length; i++)
+            for (int i = 1; i < _path.Length; i++)
             {
+                if (output[i - 1].directories.Count == 0) break;
                 for (int j = 0; j < output[i - 1].directories.Count; j++)
                 {
-                    if (output[i - 1].directories[j].name == path[i])
+                    if (output[i - 1].directories[j].name == _path[i])
                     {
                         output[i] = output[i - 1].directories[j];
                         break;
                     }
+                    Program.WriteError("404: No such directory exists.");
                 }
             }
 
+            return output;
+        }
+
+        public static Directory[] FindChildren(string _name, Directory[] currentPath)
+        {
+            Directory[] output = new Directory[currentPath.Length + 1];
+            for(int i = 0; i < currentPath.Length; i++) 
+            {
+                output[i] = currentPath[i];
+            }
+
+            for(int i = 0; i < currentPath.Last().directories.Count(); i++) 
+            {
+                if (currentPath.Last().directories[i].name == _name)
+                {
+                    output[output.Length - 1] = currentPath.Last().directories[i];
+                    break;
+                }
+            }
             return output;
         }
 
@@ -89,7 +124,7 @@ namespace MiniComputer
         {
             if (newName == null || newName == " ")
             {
-                Program.WriteError("Cannot rename to nothing");
+                Program.WriteError("201: Cannot rename to nothing.");
                 return;
             }
 
