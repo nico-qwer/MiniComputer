@@ -6,32 +6,52 @@ namespace MiniComputer
 {
     internal class Program
     {
-        static string currentDirectory = "Home/";
-        static File? openFile;
+        static Directory mainDirectory = Directory.mainDirectory;
+        static Directory[] currentPath = new Directory[1] { mainDirectory };
+        //static File? openFile;
 
         static void Main(string[] args)
         {
             Title = "MiniComputer";
+            
+            while(true)
+            {
+                Write($"<{FormatDirectory(currentPath)}>: ");
+                string? input = ReadLine();
+                if (input == null || input == "") continue;
 
-            WriteLine("Booting...");
-            WriteLine("Booted!");
-
-            Write(currentDirectory + " : ");
-            ReadLine();
-
-            ReadLine();
+                string command = input.Split(" ")[0];
+                string[] arguments = input.Split(" ").Skip(1).ToArray();
+            }
         }
 
-        public static void CreateFile(string fileName, string fileDirectory)
+        public static void FindCommand(string command, string[] arguments)
         {
-            if (fileName == null || fileDirectory == null) 
+
+        }
+
+        public static void CreateFile(string fileName, Directory[] filePath)
+        {
+            if (fileName == null || filePath == null)
             {
-                WriteError("Cannot create file with no name"); 
+                WriteError("Cannot create file with no name");
                 return;
             }
 
-            File newFile = new File(fileName, fileDirectory);
+            File newFile = new File(fileName, filePath);
             WriteLine("Created file " + newFile.name);
+        }
+
+        public static void CreateDirectory(string dirName, Directory[] dirPath)
+        {
+            if (dirName == null|| dirName == "" || dirPath == null)
+            {
+                WriteError("Cannot create directory with no name");
+                return;
+            }
+
+            File newDir = new File(dirName, dirPath);
+            WriteLine("Created directory " + newDir.name);
         }
 
         public static void WriteError(string text)
@@ -40,42 +60,23 @@ namespace MiniComputer
             WriteLine(text);
             ResetColor();
         }
-    }
 
-    class File 
-    {
-        public static List<File> files = new List<File>();
-
-        public string name = "Unnamed";
-        public string directory = "Home/";
-        public int size = 0;
-        public string type = "txt";
-
-        public File(string newName, string newDirectory)
+        public static string FormatDirectory(Directory[] path)
         {
-            Rename(newName);
-            directory = newDirectory;
-            files.Add(this);
+            string output = "";
+            foreach (Directory directory in path)
+            {
+                output = output + "/" + directory.name;
+            }
+            return output;
         }
-
-        public void Rename(string newName) 
+        public static Directory[] UnFormatDirectory(string path)
         {
-            if (newName == null || newName == " ")
-            {
-                Program.WriteError("Cannot rename to nothing");
-                return;
-            }
+            string[] splitedPath = path.Split("/");
 
-            string newExtension = newName.Split('.').Last();
+            Directory[] output = Directory.Find(splitedPath);
 
-            if (newExtension != null)
-            {
-                name = newName;
-                type = newExtension;
-            } else
-            {
-                name = newName + "." + type;
-            }
+            return output;
         }
     }
 }
