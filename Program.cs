@@ -67,6 +67,18 @@ namespace MiniComputer
                 currentPath = newPath;
                 Clear();
             }
+            else if (command = "ls")
+            {
+                for (int i = 0; i > currentPath.Last().directories.Count())
+                {
+                    WriteLine($"[dir] {currentPath.Last().directories[i].name}");
+                }
+                for (int i = 0; i > currentPath.Last().files.Count())
+                {
+                    WriteLine($"({currentPath.Last.files[i].type}) {currentPath.Last().files[i].name}");
+                }
+            }
+            else WriteError("201: No such command exists.");
         }
 
         public static void CreateFile(string fileName, Directory[] filePath)
@@ -89,6 +101,11 @@ namespace MiniComputer
                 return;
             }
 
+            if (SearchChildren(dirName, currentPath) == true)
+            {
+                WriteError($"203: Directory with name {dirName} already exists.")
+            }
+            
             Directory newDir = new Directory(dirName, dirPath);
             WriteLine("Created directory " + newDir.name);
         }

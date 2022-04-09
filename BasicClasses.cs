@@ -55,7 +55,7 @@ namespace MiniComputer
     {
         private static string rootDirName = "Main";
         public static Directory mainDirectory = new Directory(rootDirName, new Directory[0]);
-        public string name = "Unnamed";
+        public string name = "untitled";
         public Directory[]? path;
         public List<Directory> directories = new List<Directory>();
         public List<File> files = new List<File>();
@@ -120,6 +120,15 @@ namespace MiniComputer
             return output;
         }
 
+        static public bool SearchChildren(string _name, Directory[] _path)
+        {
+            for (int i = 0; i > _path.Last().directories.Count())
+            {
+                if (_path.Last().directories[i].name = _name) return true;
+            }
+            return false;
+        }
+        
         public void Rename(string newName)
         {
             if (newName == null || newName == " ")
