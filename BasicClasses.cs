@@ -67,6 +67,21 @@ namespace MiniComputer
             }
         }
 
+        public static File? FindInChildren(string _name, Directory[] currentPath)
+        {
+            File? output = null;
+
+            for(int i = 0; i < currentPath.Last().files.Count(); i++) 
+            {
+                if (currentPath.Last().files[i].name == _name)
+                {
+                    output = currentPath.Last().files[i];
+                    break;
+                }
+            }
+            return output;
+        }
+
         public void Move(Directory[] newPath)
         {
             if (newPath == null)
@@ -133,7 +148,7 @@ namespace MiniComputer
             }
             return output;
         }
-
+        
         public void Rename(string newName)
         {
             if (newName == null || newName == " ")

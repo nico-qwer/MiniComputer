@@ -100,7 +100,7 @@ namespace MiniComputer
                 return;
             }
 
-            if (Directory.FindInChildren(fileName, currentPath) != null) 
+            if (File.FindInChildren(fileName, currentPath) != null) 
             {
                 WriteError("401: Name is already used.");
                 return;
@@ -115,6 +115,11 @@ namespace MiniComputer
             if (dirName == null|| dirName == "")
             {
                 WriteError("201: Cannot create directory with no name.");
+                return;
+            }
+            if (Directory.FindInChildren(dirName, currentPath) != null) 
+            {
+                WriteError("401: Name is already used.");
                 return;
             }
 
@@ -137,7 +142,6 @@ namespace MiniComputer
         public static string FormatDirectory(Directory[] path)
         {
             string output = Globals.mainDirectory.name;
-            WriteLine(path.Length.ToString());
             for(int i = 1; i < path.Length; i++) 
             {   
                 output = output + "/" + path[i].name;
