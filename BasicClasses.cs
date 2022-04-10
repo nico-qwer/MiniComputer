@@ -7,7 +7,7 @@ namespace MiniComputer
     class Globals
     {
         public static string rootDirName = "Main";
-        public static Directory mainDirectory = new Directory(rootDirName, new Directory[0]);
+        public static Directory rootDirectory = new Directory(rootDirName, new Directory[0]);
     }
 
     class Item
@@ -31,7 +31,7 @@ namespace MiniComputer
                 WriteLine($"Successfuly deleted {_name} from {_path.Last().name}.");
                 return;
             }
-            Program.WriteError("404: No such file or directory exists.");
+            Program.WriteError("No such file or directory exists.");
         }
     }
 
@@ -51,7 +51,7 @@ namespace MiniComputer
         {
             if (newName == null || newName == " ")
             {
-                Program.WriteError("201: Cannot rename to nothing.");
+                Program.WriteError("Cannot rename to nothing.");
                 return;
             }
             string[] splitedName = newName.Split('.');
@@ -74,7 +74,13 @@ namespace MiniComputer
 
             for(int i = 0; i < currentPath.Last().files.Count(); i++) 
             {
+                string cutname = currentPath.Last().files[i].name.Substring(0, currentPath.Last().files[i].name.LastIndexOf("."));
                 if (currentPath.Last().files[i].name == _name)
+                {
+                    output = currentPath.Last().files[i];
+                    break;
+                }
+                else if (cutname == _name)
                 {
                     output = currentPath.Last().files[i];
                     break;
@@ -87,7 +93,7 @@ namespace MiniComputer
         {
             if (newPath == null)
             {
-                Program.WriteError("201: Cannot move nowhere.");
+                Program.WriteError("Cannot move nowhere.");
                 return;
             }
             if (path == null) return;
@@ -116,7 +122,7 @@ namespace MiniComputer
         public static Directory[] FindPath(string[] _path)
         {
             Directory[] output = new Directory[_path.Length];
-            output[0] = Globals.mainDirectory;
+            output[0] = Globals.rootDirectory;
 
             for (int i = 1; i < _path.Length; i++)
             {
@@ -128,7 +134,7 @@ namespace MiniComputer
                         output[i] = output[i - 1].directories[j];
                         break;
                     }
-                    Program.WriteError("404: No such directory exists.");
+                    Program.WriteError("No such directory exists.");
                 }
             }
 
@@ -154,7 +160,7 @@ namespace MiniComputer
         {
             if (newName == null || newName == " ")
             {
-                Program.WriteError("201: Cannot rename to nothing.");
+                Program.WriteError("Cannot rename to nothing.");
                 return;
             }
 

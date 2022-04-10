@@ -7,9 +7,8 @@ namespace MiniComputer
 {
     internal class Program
     {
-        static Directory[] currentPath = new Directory[1] { Globals.mainDirectory };
+        static Directory[] currentPath = new Directory[1] { Globals.rootDirectory };
         static File? openFile;
-        static 
 
         static void Main(string[] args)
         {
@@ -17,7 +16,7 @@ namespace MiniComputer
             
             while(true)
             {
-                Write($"<{FormatDirectory(currentPath)}>: ");
+                Write($"<{FormatPath(currentPath)}>: ");
                 string? input = ReadLine();
                 if (input == null || input == "") continue;
 
@@ -35,9 +34,15 @@ namespace MiniComputer
         {
             if (command == "new")
             {
+                if (arguments.Length != 2)
+                {
+                    WriteError("Please write the necessary arguments.");
+                    return;
+                }
+
                 if (arguments[0] == null || arguments[1] == null)
                 {
-                    WriteError("101: Please write the necessary arguments.");
+                    WriteError("Please write the necessary arguments.");
                     return;
                 }
 
@@ -51,22 +56,18 @@ namespace MiniComputer
                 }
                 else
                 {
-                    WriteError($"102: {arguments[0]} not recognised.");
+                    WriteError($"{arguments[0]} not recognised.");
                 }
             }
             else if (command == "cd")
             {
                 if (arguments[0] == null)
                 {
-                    WriteError("101: Please write the necessary arguments.");
+                    WriteError("Please write the necessary arguments.");
                     return;
                 }
 
-                Directory[] newPath = UnFormatDirectory(arguments[0]);
-                if (newPath == null) return;
-
-                currentPath = newPath;
-                Clear();
+                ChangeDirectory(arguments[0]);
             }
             else if (command == "list")
             {
@@ -95,26 +96,27 @@ namespace MiniComputer
             {
                 if (arguments[0] == null)
                 {
-                    WriteError("101: Please write the necessary arguments.");
+                    WriteError("Please write the necessary arguments.");
                     return;
                 }
 
                 OpenFile(arguments[0]);
                 
             }
-            else WriteError("201: No such command exists.");
+            else WriteError("No such command exists.");
         }
 
         public static void OpenFile(string name)
         {
-            Clear();
-            openFile = File.FindInChildren(arguments[0]);
+            openFile = File.FindInChildren(name, currentPath);
 
             if (openFile == null)
             {
-                WriteError("404: No such file exists.")
+                WriteError("No such file exists.");
                 return;
             }
+
+            Clear();
 
             bool writen = false;
             for (int i = 0; i < openFile.content.Count(); i++)
@@ -130,9 +132,9 @@ namespace MiniComputer
             }
 
             var keyInfo = ReadKey(true);
-            while (keyInfo.Key != ConsoleKey.q)
+            while (keyInfo.Key != ConsoleKey.Q)
             {
-                keyInfo = ReadKey(true)
+                keyInfo = ReadKey(true);
             }
             Clear();
         }
@@ -141,13 +143,13 @@ namespace MiniComputer
         {
             if (fileName == null || fileName == "")
             {
-                WriteError("201: Cannot create file with no name.");
+                WriteError("Cannot create file with no name.");
                 return;
             }
 
             if (File.FindInChildren(fileName, currentPath) != null) 
             {
-                WriteError("401: Name is already used.");
+                WriteError("Name is already used.");
                 return;
             }
 
@@ -159,16 +161,19 @@ namespace MiniComputer
         {
             if (dirName == null|| dirName == "")
             {
-                WriteError("201: Cannot create directory with no name.");
+                WriteError("Cannot create directory with no name.");
                 return;
             }
             if (Directory.FindInChildren(dirName, currentPath) != null) 
             {
-                WriteError("401: Name is already used.");
+                WriteError("Name is already used.");
                 return;
             }
 
             Directory newDir = new Directory(dirName, currentPath);
+
+            ChangeDirectory(dirName);
+
             WriteLine("Created directory " + newDir.name);
         }
 
@@ -176,40 +181,67 @@ namespace MiniComputer
         {
             Item.DeleteItem(name, currentPath);
         }
+        
+        public static void ChangeDirectory(string dirName)
+        {
+            if (dirName == "<=")
+            {
+                if (currentPath.Last() == Globals.rootDirectory)
+                {
+                    WriteError("Cannot go back further than Main");
+                    return;
+                }
+                dirName = FormatPath(currentPath[currentPath.Length - 1].path);
+            }
+            Directory[] newPath = UnFormatPath(dirName);
+            if (newPath == null) return;
+
+            currentPath = newPath;
+            Clear();
+        }
 
         public static void WriteError(string text)
         {
             ForegroundColor = ConsoleColor.Red;
+            Write("Error: ");
             WriteLine(text);
             ResetColor();
         }
 
-        public static string FormatDirectory(Directory[] path)
+        public static string FormatPath(Directory[] path)
         {
-            string output = Globals.mainDirectory.name;
+            string output = Globals.rootDirName;
             for(int i = 1; i < path.Length; i++) 
             {   
                 output = output + "/" + path[i].name;
             }
             return output;
         }
-        public static Directory[] UnFormatDirectory(string path)
+        public static Directory[] UnFormatPath(string path)
         {
             string[] splitedPath = path.Split("/"); 
             Directory[] output = default!;
 
-            if (splitedPath.Length == 1 && splitedPath[0] != Globals.mainDirectory.name)
+            if (splitedPath.Length == 1 && splitedPath[0] != Globals.rootDirName)
             {
                 Directory? directory = Directory.FindInChildren(splitedPath[0], currentPath);
                 if (directory != null) 
                 {
                     output = new Directory[directory.path.Count() + 1];
+
+                    for(int i = 0; i < directory.path.Count(); i++) 
+                    {
+                        output[i] = directory.path[i];
+                    }
+
                     Directory? lastDir = Directory.FindInChildren(splitedPath[0], currentPath);
                     if (lastDir != null)
                     {
                         output[output.Length - 1] = lastDir;
                     }
-                }
+                } 
+                else WriteError("No such directory exists.");
+
 
             } else
             {
