@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using static System.Console;
 
@@ -7,7 +8,8 @@ namespace MiniComputer
     internal class Program
     {
         static Directory[] currentPath = new Directory[1] { Globals.mainDirectory };
-        //static File? openFile;
+        static File? openFile;
+        static 
 
         static void Main(string[] args)
         {
@@ -89,7 +91,50 @@ namespace MiniComputer
             {
                 Clear();
             }
+            else if (command == "open")
+            {
+                if (arguments[0] == null)
+                {
+                    WriteError("101: Please write the necessary arguments.");
+                    return;
+                }
+
+                OpenFile(arguments[0]);
+                
+            }
             else WriteError("201: No such command exists.");
+        }
+
+        public static void OpenFile(string name)
+        {
+            Clear();
+            openFile = File.FindInChildren(arguments[0]);
+
+            if (openFile == null)
+            {
+                WriteError("404: No such file exists.")
+                return;
+            }
+
+            bool writen = false;
+            for (int i = 0; i < openFile.content.Count(); i++)
+            {
+                writen = true;
+                Write(i + "| ");
+                WriteLine(openFile.content[i]);
+            }
+
+            if (writen == false)
+            {
+                WriteLine("File is empty.");
+            }
+
+            var keyInfo = ReadKey(true);
+            while (keyInfo.Key != ConsoleKey.q)
+            {
+                keyInfo = ReadKey(true)
+            }
+            Clear();
         }
 
         public static void CreateFile(string fileName)

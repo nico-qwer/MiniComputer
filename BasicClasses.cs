@@ -38,6 +38,7 @@ namespace MiniComputer
     class File : Item
     {
         public string type = "txt";
+        public List<string> content = new List<string>();
 
         public File(string newName, Directory[] newPath)
         {
