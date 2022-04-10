@@ -4,17 +4,46 @@ using static System.Console;
 
 namespace MiniComputer
 {
-    class File
+    class Globals
+    {
+        public static string rootDirName = "Main";
+        public static Directory mainDirectory = new Directory(rootDirName, new Directory[0]);
+    }
+
+    class Item
     {
         public string name = "Unnamed";
-        public Directory[] path;
-        public int size = 0;
+        public Directory[] path = default!;
+
+        public static void DeleteItem(string _name, Directory[] _path)
+        {
+            for (int i = 0; i < _path.Last().directories.Count(); i++)
+            {
+                if (_path.Last().directories[i].name != _name) continue;
+                _path.Last().directories.RemoveAt(i);
+                WriteLine($"Successfuly deleted {_name} and it's contents from {_path.Last().name}.");
+                return;
+            }
+            for (int i = 0; i < _path.Last().files.Count(); i++)
+            {
+                if (_path.Last().files[i].name != _name) continue;
+                _path.Last().files.RemoveAt(i);
+                WriteLine($"Successfuly deleted {_name} from {_path.Last().name}.");
+                return;
+            }
+            Program.WriteError("404: No such file or directory exists.");
+        }
+    }
+
+    class File : Item
+    {
         public string type = "txt";
 
         public File(string newName, Directory[] newPath)
         {
             Rename(newName);
             path = newPath;
+            path.Last().files.Add(this);
         }
 
         public void Rename(string newName)
@@ -24,10 +53,10 @@ namespace MiniComputer
                 Program.WriteError("201: Cannot rename to nothing.");
                 return;
             }
+            string[] splitedName = newName.Split('.');
+            string newExtension = splitedName.Last();
 
-            string newExtension = newName.Split('.').Last();
-
-            if (newExtension != null && newExtension != "")
+            if (newExtension != null && newExtension != "" && splitedName.Length > 1)
             {
                 name = newName;
                 type = newExtension;
@@ -45,18 +74,17 @@ namespace MiniComputer
                 Program.WriteError("201: Cannot move nowhere.");
                 return;
             }
+            if (path == null) return;
 
+            path.Last().files.Remove(this);
             path = newPath;
+            path.Last().files.Add(this);
 
         }
     }
 
-    class Directory
+    class Directory : Item
     {
-        private static string rootDirName = "Main";
-        public static Directory mainDirectory = new Directory(rootDirName, new Directory[0]);
-        public string name = "Unnamed";
-        public Directory[]? path;
         public List<Directory> directories = new List<Directory>();
         public List<File> files = new List<File>();
 
@@ -64,25 +92,15 @@ namespace MiniComputer
         {
             Rename(newName);
             path = newPath;
-            if (newName == rootDirName) return;
+
+            if (newName == Globals.rootDirName) return;
             newPath.Last().directories.Add(this);
         }
 
-        public void DeleteDirectory(string _name, Directory[] _path)
-        {
-            for (int i = 0; i < _path.Last().directories.Count(); i++)
-            {
-                if (_path.Last().directories[i].name != _name) continue;
-                _path.Last().directories.RemoveAt(i);
-                return;
-            }
-            Program.WriteError("404: No such directory exists.");
-        }
-
-        public static Directory[] Find(string[] _path)
+        public static Directory[] FindPath(string[] _path)
         {
             Directory[] output = new Directory[_path.Length];
-            output[0] = mainDirectory;
+            output[0] = Globals.mainDirectory;
 
             for (int i = 1; i < _path.Length; i++)
             {
@@ -101,19 +119,15 @@ namespace MiniComputer
             return output;
         }
 
-        public static Directory[] FindChildren(string _name, Directory[] currentPath)
+        public static Directory? FindInChildren(string _name, Directory[] currentPath)
         {
-            Directory[] output = new Directory[currentPath.Length + 1];
-            for(int i = 0; i < currentPath.Length; i++) 
-            {
-                output[i] = currentPath[i];
-            }
+            Directory? output = null;
 
             for(int i = 0; i < currentPath.Last().directories.Count(); i++) 
             {
                 if (currentPath.Last().directories[i].name == _name)
                 {
-                    output[output.Length - 1] = currentPath.Last().directories[i];
+                    output = currentPath.Last().directories[i];
                     break;
                 }
             }
