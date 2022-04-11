@@ -8,6 +8,21 @@ namespace MiniComputer
     {
         public static string rootDirName = "Main";
         public static Directory rootDirectory = new Directory(rootDirName, new Directory[0]);
+        public static void WriteError(string text)
+        {
+            ForegroundColor = ConsoleColor.Red;
+            Write("Error: ");
+            WriteLine(text);
+            ResetColor();
+        }
+
+        public static void WriteWithColor(string text, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor txtColor = ConsoleColor.White)
+        {
+            BackgroundColor = bgColor;
+            ForegroundColor = txtColor;
+            WriteLine(text);
+            ResetColor();
+        }
     }
 
     class Item
@@ -31,7 +46,7 @@ namespace MiniComputer
                 WriteLine($"Successfuly deleted {_name} from {_path.Last().name}.");
                 return;
             }
-            Program.WriteError("No such file or directory exists.");
+            Globals.WriteError("No such file or directory exists.");
         }
     }
 
@@ -51,7 +66,7 @@ namespace MiniComputer
         {
             if (newName == null || newName == " ")
             {
-                Program.WriteError("Cannot rename to nothing.");
+                Globals.WriteError("Cannot rename to nothing.");
                 return;
             }
             string[] splitedName = newName.Split('.');
@@ -74,13 +89,7 @@ namespace MiniComputer
 
             for(int i = 0; i < currentPath.Last().files.Count(); i++) 
             {
-                string cutname = currentPath.Last().files[i].name.Substring(0, currentPath.Last().files[i].name.LastIndexOf("."));
                 if (currentPath.Last().files[i].name == _name)
-                {
-                    output = currentPath.Last().files[i];
-                    break;
-                }
-                else if (cutname == _name)
                 {
                     output = currentPath.Last().files[i];
                     break;
@@ -93,7 +102,7 @@ namespace MiniComputer
         {
             if (newPath == null)
             {
-                Program.WriteError("Cannot move nowhere.");
+                Globals.WriteError("Cannot move nowhere.");
                 return;
             }
             if (path == null) return;
@@ -134,7 +143,7 @@ namespace MiniComputer
                         output[i] = output[i - 1].directories[j];
                         break;
                     }
-                    Program.WriteError("No such directory exists.");
+                    Globals.WriteError("No such directory exists.");
                 }
             }
 
@@ -160,7 +169,7 @@ namespace MiniComputer
         {
             if (newName == null || newName == " ")
             {
-                Program.WriteError("Cannot rename to nothing.");
+                Globals.WriteError("Cannot rename to nothing.");
                 return;
             }
 

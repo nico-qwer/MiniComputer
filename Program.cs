@@ -8,7 +8,7 @@ namespace MiniComputer
     internal class Program
     {
         static Directory[] currentPath = new Directory[1] { Globals.rootDirectory };
-        static File? openFile;
+        public static File? openFile;
 
         static void Main(string[] args)
         {
@@ -36,13 +36,13 @@ namespace MiniComputer
             {
                 if (arguments.Length != 2)
                 {
-                    WriteError("Please write the necessary arguments.");
+                    Globals.WriteError("Please write the necessary arguments.");
                     return;
                 }
 
                 if (arguments[0] == null || arguments[1] == null)
                 {
-                    WriteError("Please write the necessary arguments.");
+                    Globals.WriteError("Please write the necessary arguments.");
                     return;
                 }
 
@@ -56,14 +56,14 @@ namespace MiniComputer
                 }
                 else
                 {
-                    WriteError($"{arguments[0]} not recognised.");
+                    Globals.WriteError($"{arguments[0]} not recognised.");
                 }
             }
             else if (command == "cd")
             {
                 if (arguments[0] == null)
                 {
-                    WriteError("Please write the necessary arguments.");
+                    Globals.WriteError("Please write the necessary arguments.");
                     return;
                 }
 
@@ -96,60 +96,27 @@ namespace MiniComputer
             {
                 if (arguments[0] == null)
                 {
-                    WriteError("Please write the necessary arguments.");
+                    Globals.WriteError("Please write the necessary arguments.");
                     return;
                 }
 
-                OpenFile(arguments[0]);
+                FileViewer.OpenFile(arguments[0], currentPath);
                 
             }
-            else WriteError("No such command exists.");
-        }
-
-        public static void OpenFile(string name)
-        {
-            openFile = File.FindInChildren(name, currentPath);
-
-            if (openFile == null)
-            {
-                WriteError("No such file exists.");
-                return;
-            }
-
-            Clear();
-
-            bool writen = false;
-            for (int i = 0; i < openFile.content.Count(); i++)
-            {
-                writen = true;
-                Write(i + "| ");
-                WriteLine(openFile.content[i]);
-            }
-
-            if (writen == false)
-            {
-                WriteLine("File is empty.");
-            }
-
-            var keyInfo = ReadKey(true);
-            while (keyInfo.Key != ConsoleKey.Q)
-            {
-                keyInfo = ReadKey(true);
-            }
-            Clear();
+            else Globals.WriteError("No such command exists.");
         }
 
         public static void CreateFile(string fileName)
         {
             if (fileName == null || fileName == "")
             {
-                WriteError("Cannot create file with no name.");
+                Globals.WriteError("Cannot create file with no name.");
                 return;
             }
 
             if (File.FindInChildren(fileName, currentPath) != null) 
             {
-                WriteError("Name is already used.");
+                Globals.WriteError("Name is already used.");
                 return;
             }
 
@@ -161,12 +128,12 @@ namespace MiniComputer
         {
             if (dirName == null|| dirName == "")
             {
-                WriteError("Cannot create directory with no name.");
+                Globals.WriteError("Cannot create directory with no name.");
                 return;
             }
             if (Directory.FindInChildren(dirName, currentPath) != null) 
             {
-                WriteError("Name is already used.");
+                Globals.WriteError("Name is already used.");
                 return;
             }
 
@@ -188,7 +155,7 @@ namespace MiniComputer
             {
                 if (currentPath.Last() == Globals.rootDirectory)
                 {
-                    WriteError("Cannot go back further than Main");
+                    Globals.WriteError("Cannot go back further than Main");
                     return;
                 }
                 dirName = FormatPath(currentPath[currentPath.Length - 1].path);
@@ -198,14 +165,6 @@ namespace MiniComputer
 
             currentPath = newPath;
             Clear();
-        }
-
-        public static void WriteError(string text)
-        {
-            ForegroundColor = ConsoleColor.Red;
-            Write("Error: ");
-            WriteLine(text);
-            ResetColor();
         }
 
         public static string FormatPath(Directory[] path)
@@ -240,7 +199,7 @@ namespace MiniComputer
                         output[output.Length - 1] = lastDir;
                     }
                 } 
-                else WriteError("No such directory exists.");
+                else Globals.WriteError("No such directory exists.");
 
 
             } else
