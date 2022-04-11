@@ -1,5 +1,5 @@
 using System;
-
+using System.IO;
 using static System.Console;
 
 namespace MiniComputer
@@ -8,6 +8,8 @@ namespace MiniComputer
     {
         public static string rootDirName = "Main";
         public static Directory rootDirectory = new Directory(rootDirName, new Directory[0]);
+        public static Directory[] currentPath = new Directory[1] { Globals.rootDirectory };
+        public static File? openFile;
         public static void WriteError(string text)
         {
             ForegroundColor = ConsoleColor.Red;
@@ -174,6 +176,16 @@ namespace MiniComputer
             }
 
             name = newName;
+        }
+    }
+
+    class SaveSystem
+    {
+        public static bool SaveToFile(File fileToSave)
+        {
+
+
+            return true;
         }
     }
 }

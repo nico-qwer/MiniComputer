@@ -8,9 +8,9 @@ namespace MiniComputer
     {
         public static void OpenFile(string name, Directory[] filePath)
         {
-            Program.openFile = File.FindInChildren(name, filePath);
+            Globals.openFile = File.FindInChildren(name, filePath);
 
-            if (Program.openFile == null)
+            if (Globals.openFile == null)
             {
                 Globals.WriteError("No such file exists.");
                 return;
@@ -21,11 +21,20 @@ namespace MiniComputer
             WriteLine("");
 
             bool writen = false;
-            for (int i = 0; i < Program.openFile.content.Count(); i++)
+            for (int i = 0; i < Globals.openFile.content.Count(); i++)
             {
+                string number = i.ToString();
+                int digits = (int)Math.Floor(Math.Log10(Globals.openFile.content.Count()) + 1);
+
+                for (int j = 0; j < digits - number.Length; j++)
+                {
+                    number += " ";
+                }
+                number += "|";
+
                 writen = true;
-                Write(i + "| ");
-                WriteLine(Program.openFile.content[i]);
+                Write(number);
+                WriteLine(Globals.openFile.content[i]);
             }
 
             if (writen == false)
@@ -38,48 +47,55 @@ namespace MiniComputer
             {
                 keyInfo = ReadKey(true);
             }
+            Globals.openFile = null;
             Clear();
         }
     }
-    
+
     class FileEditor
     {
         public static int mode = 0;
+        public static int selectedLine = 0;
 
         public static void EditFile(string name, Directory[] filePath)
         {
-            Program.openFile = File.FindInChildren(name, filePath);
-
-            if (Program.openFile == null)
+            Globals.openFile = File.FindInChildren(name, filePath);
+            if (Globals.openFile == null)
             {
                 Globals.WriteError("No such file exists.");
                 return;
             }
 
-            int selectedLine = 0;
-
-            Clear();
-            Globals.WriteWithColor("FILE EDITOR V0.1.0", ConsoleColor.White, ConsoleColor.Black);
-            WriteLine("");
-
-            bool writen = false;
-            for (int i = 0; i < Program.openFile.content.Count(); i++)
+            bool exit = false;
+            while (exit == false)
             {
-                if (i == selectedLine)
+                ConsoleKeyInfo keyInfo = ReadKey(true);
+                
+                switch (keyInfo.Key)
                 {
-                    WriteSelected(i + "| " + Program.openFile.content[i]);
-                    continue;
+                    case ConsoleKey.UpArrow:
+                        if (selectedLine <= 0) break;
+                        selectedLine -= 1;
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        if (selectedLine >= Globals.openFile.content.Count()) break;
+                        selectedLine += 1;
+                        break;
+                        
+                    case ConsoleKey.Q:
+                        exit = true;
+                        break;
+                        
+                    default:
+                        break;
                 }
 
-                writen = true;
-                Write(i + "| " + Program.openFile.content[i]);
+                Refresh();
             }
 
-            if (writen == false)
-            {
-                WriteLine("File is empty.");
-            }
-
+            Globals.openFile = null;
+            Clear();
         }
 
         static void WriteSelected(string text)
@@ -88,6 +104,37 @@ namespace MiniComputer
             ForegroundColor = ConsoleColor.White;
             WriteLine(text);
             ResetColor();
+        }
+
+        static void Refresh()
+        {
+            if (Globals.openFile == null) return;
+
+            Clear();
+            Globals.WriteWithColor("FILE EDITOR V0.1.0", ConsoleColor.White, ConsoleColor.Black);
+            WriteLine("");
+
+            bool writen = false;
+            for (int i = 0; i < Globals.openFile.content.Count(); i++)
+            {
+                string number = i.ToString();
+                int digits = (int)Math.Floor(Math.Log10(Globals.openFile.content.Count()) + 1);
+
+                for (int j = 0; j < digits - number.Length; j++)
+                {
+                    number += " ";
+                }
+                number += "| ";
+
+                writen = true;
+                Write(number);
+                WriteLine(Globals.openFile.content[i]);
+            }
+
+            if (writen == false)
+            {
+                Write("0 | ");
+            }
         }
     }
 }
