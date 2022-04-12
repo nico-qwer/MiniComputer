@@ -30,7 +30,7 @@ namespace MiniComputer
                 {
                     number += " ";
                 }
-                number += "|";
+                number += "| ";
 
                 writen = true;
                 Write(number);
@@ -66,6 +66,8 @@ namespace MiniComputer
                 return;
             }
 
+            Refresh();
+
             bool exit = false;
             while (exit == false)
             {
@@ -74,7 +76,7 @@ namespace MiniComputer
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        if (selectedLine <= 0) break;
+                        if (selectedLine < 0) break;
                         selectedLine -= 1;
                         break;
 
@@ -87,6 +89,14 @@ namespace MiniComputer
                         exit = true;
                         break;
                         
+                    case ConsoleKey.Enter:
+                        LineEdit(selectedLine);
+                        break;
+
+                    case ConsoleKey.N:
+                        Globals.openFile.content.Add(" ");
+                        break;
+
                     default:
                         break;
                 }
@@ -100,10 +110,23 @@ namespace MiniComputer
 
         static void WriteSelected(string text)
         {
-            BackgroundColor = ConsoleColor.Black;
-            ForegroundColor = ConsoleColor.White;
+            BackgroundColor = ConsoleColor.White;
+            ForegroundColor = ConsoleColor.Black;
             WriteLine(text);
             ResetColor();
+        }
+
+        static void LineEdit(int line)
+        {
+            if (Globals.openFile == null) return;
+            if (line < 0 || line >= Globals.openFile.content.Count()) return;
+
+            Clear();
+            Write(line + " | ");
+
+            string? newLine = ReadLine();
+            if (newLine == null) newLine = " ";
+            Globals.openFile.content[line] = newLine;
         }
 
         static void Refresh()
@@ -127,8 +150,15 @@ namespace MiniComputer
                 number += "| ";
 
                 writen = true;
-                Write(number);
-                WriteLine(Globals.openFile.content[i]);
+
+                if (selectedLine == i)
+                {
+                    WriteSelected(number + Globals.openFile.content[i]);
+
+                } else
+                {
+                    WriteLine(number + Globals.openFile.content[i]);
+                }
             }
 
             if (writen == false)
