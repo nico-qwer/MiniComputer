@@ -8,6 +8,9 @@ namespace MiniComputer
     {
         public static void OpenFile(string name, Directory[] filePath)
         {
+            int idx = name.LastIndexOf('.');
+            if (idx != -1) name = name[..idx];
+
             Globals.openFile = File.FindInChildren(name, filePath);
 
             if (Globals.openFile == null)
@@ -17,7 +20,7 @@ namespace MiniComputer
             }
 
             Clear();
-            Globals.WriteWithColor("FILE VIEWER V0.1.0", ConsoleColor.White, ConsoleColor.Black);
+            Globals.WriteWithColor($"FILE VIEWER V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine("");
 
             bool writen = false;
@@ -59,10 +62,17 @@ namespace MiniComputer
 
         public static void EditFile(string name, Directory[] filePath)
         {
+            int idx = name.LastIndexOf('.');
+            if (idx != -1) name = name[..idx];
+
             Globals.openFile = File.FindInChildren(name, filePath);
             if (Globals.openFile == null)
             {
                 Globals.WriteError("No such file exists.");
+                return;
+            } else if (Globals.openFile.extension == "img")
+            {
+                Globals.WriteError("Cannot edit 'img' file. Change it back to 'txt' format to edit it.");
                 return;
             }
 
@@ -122,6 +132,8 @@ namespace MiniComputer
             if (line < 0 || line >= Globals.openFile.content.Count()) return;
 
             Clear();
+            Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
+            WriteLine("");
             Write(line + " | ");
 
             string? newLine = ReadLine();
@@ -134,7 +146,7 @@ namespace MiniComputer
             if (Globals.openFile == null) return;
 
             Clear();
-            Globals.WriteWithColor("FILE EDITOR V0.1.0", ConsoleColor.White, ConsoleColor.Black);
+            Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine("");
 
             bool writen = false;

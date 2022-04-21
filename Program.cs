@@ -34,7 +34,7 @@ namespace MiniComputer
             {
                 case "new":
                     //If not enough args, return
-                    if (arguments.Length != 2)
+                    if (arguments.Length < 2)
                     {
                         Globals.WriteError("Please write the necessary arguments.");
                         return;
@@ -81,7 +81,7 @@ namespace MiniComputer
                     }
                     for (int i = 0; i < Globals.currentPath.Last().files.Count(); i++)
                     {
-                        WriteLine($"   ({Globals.currentPath.Last().files[i].type}) {Globals.currentPath.Last().files[i].name}");
+                        WriteLine($"   ({Globals.currentPath.Last().files[i].extension}) {Globals.currentPath.Last().files[i].name}");
                         writen = true;
                     }
                     if (writen == false) WriteLine("Directory is empty.");
@@ -156,14 +156,13 @@ namespace MiniComputer
                 return;
             }
 
-            if (File.FindInChildren(fileName, Globals.currentPath) != null)
-            {
-                Globals.WriteError("Name is already used.");
-                return;
-            }
+            int count = fileName.Split('.').Length - 1;
+            if (count > 1) { Globals.WriteError("Cannot have multiple file extensions."); return; }
+
+            if (File.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
 
             File newFile = new File(fileName, Globals.currentPath);
-            WriteLine("Created file " + newFile.name);
+            WriteLine($"Created file {newFile.name}.{newFile.extension}");
         }
 
         public static void CreateDirectory(string dirName)
@@ -194,13 +193,17 @@ namespace MiniComputer
                 Globals.WriteError("No such file exists.");
                 return;
             }
+            string oldExtension = toRename.extension;
 
             toRename.Rename(newName);
-            WriteLine($"Renamed {oldName} to {toRename.name}.");
+            WriteLine($"Renamed {oldName}.{oldExtension} to {toRename.name}.{toRename.extension}.");
         }
 
         public static void Delete(string name)
         {
+            int idx = name.LastIndexOf('.');
+            if (idx != -1)name = name[..idx];
+
             Item.DeleteItem(name, Globals.currentPath);
         }
 

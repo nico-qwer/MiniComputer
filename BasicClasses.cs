@@ -54,8 +54,8 @@ namespace MiniComputer
 
     class File : Item
     {
-        public string type = "txt";
-        public List<string> content = new List<string>(){" "};
+        public string extension = "txt";
+        public List<string> content = new List<string>() { " " };
 
         public File(string newName, Directory[] newPath)
         {
@@ -71,17 +71,20 @@ namespace MiniComputer
                 Globals.WriteError("Cannot rename to nothing.");
                 return;
             }
-            string[] splitedName = newName.Split('.');
-            string newExtension = splitedName.Last();
 
-            if (newExtension != null && newExtension != "" && splitedName.Length > 1)
+            int count = newName.Split('.').Length - 1;
+            if (count > 1) { Globals.WriteError("Cannot have multiple file extensions."); return; }
+
+            int idx = newName.LastIndexOf('.');
+            if (idx != -1)
+            {
+                if (newName[(idx + 1)..].Length != 3) Globals.WriteError("File extensions must be 3 characters.");
+                else extension = newName[(idx + 1)..];
+
+                name = newName[..idx];
+            }else
             {
                 name = newName;
-                type = newExtension;
-            }
-            else
-            {
-                name = newName + "." + type;
             }
         }
 
@@ -89,7 +92,7 @@ namespace MiniComputer
         {
             File? output = null;
 
-            for(int i = 0; i < currentPath.Last().files.Count(); i++) 
+            for (int i = 0; i < currentPath.Last().files.Count(); i++)
             {
                 if (currentPath.Last().files[i].name == _name)
                 {
@@ -156,7 +159,7 @@ namespace MiniComputer
         {
             Directory? output = null;
 
-            for(int i = 0; i < currentPath.Last().directories.Count(); i++) 
+            for (int i = 0; i < currentPath.Last().directories.Count(); i++)
             {
                 if (currentPath.Last().directories[i].name == _name)
                 {
@@ -166,7 +169,7 @@ namespace MiniComputer
             }
             return output;
         }
-        
+
         public void Rename(string newName)
         {
             if (newName == null || newName == " ")
