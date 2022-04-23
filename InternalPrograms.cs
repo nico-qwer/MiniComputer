@@ -154,12 +154,12 @@ namespace MiniComputer
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        if (selectedLine < 0) break;
+                        if (selectedLine <= 0) break;
                         selectedLine -= 1;
                         break;
 
                     case ConsoleKey.DownArrow:
-                        if (selectedLine >= Globals.openFile.content.Count()) break;
+                        if (selectedLine >= Globals.openFile.content.Count() - 1) break;
                         selectedLine += 1;
                         break;
                         
@@ -173,6 +173,13 @@ namespace MiniComputer
 
                     case ConsoleKey.N:
                         Globals.openFile.content.Add(" ");
+                        break;
+
+                    case ConsoleKey.Backspace:
+                        if (Globals.openFile.content.Count() > 0)
+                        {
+                            Globals.openFile.content.RemoveAt(Globals.openFile.content.Count - 1);
+                        }
                         break;
 
                     default:
@@ -202,11 +209,40 @@ namespace MiniComputer
             Clear();
             Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine("");
-            Write(line + " | ");
+            Write(line + " | " + Globals.openFile.content[line]);
 
-            string? newLine = ReadLine();
+            string? newLine = Globals.openFile.content[line];
+
+            bool exit = false;
+            int charCount = Globals.openFile.content[line].Length;
+            while (exit == false)
+            {
+                ConsoleKeyInfo newLetter = ReadKey(true);
+
+                if (newLetter.Key == ConsoleKey.Backspace)
+                {
+                    if (charCount == 0) continue;
+
+                    Write("\b \b");
+                    newLine = newLine.Remove(newLine.Length - 1);
+                    charCount--;
+                }
+                else if (newLetter.Key == ConsoleKey.Enter)
+                {
+                    WriteLine("Pressed enter");
+                    exit = true;
+                }
+                else
+                {
+                    Write(newLetter.KeyChar.ToString());
+                    newLine += newLetter.KeyChar.ToString();
+                    charCount++;
+                }
+            }
+
             if (newLine == null) newLine = " ";
             Globals.openFile.content[line] = newLine;
+            WriteLine(newLine);
         }
 
         static void Refresh()

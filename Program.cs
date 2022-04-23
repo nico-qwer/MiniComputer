@@ -73,6 +73,7 @@ namespace MiniComputer
                     break;
 
                 case "list":
+                case "ls":
                     bool writen = false;
                     for (int i = 0; i < Globals.currentPath.Last().directories.Count(); i++)
                     {
@@ -160,6 +161,7 @@ namespace MiniComputer
             if (count > 1) { Globals.WriteError("Cannot have multiple file extensions."); return; }
 
             if (File.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
+            if (Directory.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
 
             File newFile = new File(fileName, Globals.currentPath);
             WriteLine($"Created file {newFile.name}.{newFile.extension}");
@@ -167,16 +169,10 @@ namespace MiniComputer
 
         public static void CreateDirectory(string dirName)
         {
-            if (dirName == null || dirName == "")
-            {
-                Globals.WriteError("Cannot create directory with no name.");
-                return;
-            }
-            if (Directory.FindInChildren(dirName, Globals.currentPath) != null)
-            {
-                Globals.WriteError("Name is already used.");
-                return;
-            }
+            if (dirName == null || dirName == "") { Globals.WriteError("Cannot create directory with no name."); return; }
+            
+            if (File.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
+            if (Directory.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
 
             Directory newDir = new Directory(dirName, Globals.currentPath);
 
