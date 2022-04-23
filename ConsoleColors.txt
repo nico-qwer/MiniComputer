@@ -12,7 +12,7 @@ DarkGray	8
 Blue		9
 Green		A
 Cyan		B
-Red		C
+Red			C
 Magenta		D
 Yellow		E
 White		F
