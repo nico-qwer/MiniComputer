@@ -1,4 +1,4 @@
-Color      |decimal    |hex
+Color          |decimal    |hex
         
 Black		0           0
 DarkBlue	1           1
