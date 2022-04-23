@@ -1,5 +1,18 @@
 # MiniComputer
-A mini computer emulator using commands to interact with the user.  
+
+A mini computer app using commands to interact with the user.  
 A bit like the early dos computers (i guess)  
-Has a tree-like directory system  
 Using C# and .NET  
+
+
+## Tree like directory system:  
+
+You can create directories inside directories forever
+
+
+## Image system:
+
+Use hex numbers to show a pixel color  
+New line means new row of pixels  
+You can use spaces as much as you like between numbers
+See ConsoleColors.txt for all colors available and their hex number
