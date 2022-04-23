@@ -1,4 +1,4 @@
-Color          |decimal    |hex
+Color		|decimal	|hex
         
 Black		0           0
 DarkBlue	1           1
@@ -12,7 +12,7 @@ DarkGray	8           8
 Blue		9           9
 Green		10          A
 Cyan		11          B
-Red		12          C
-Magenta		13	    D
-Yellow		14	    E
-White		15	    F
+Red			12          C
+Magenta		13			D
+Yellow		14			E
+White		15			F
