@@ -19,6 +19,12 @@ namespace MiniComputer
                 return;
             }
 
+            if (Globals.openFile.extension == "img")
+            {
+                ImageViewer();
+                return;
+            }
+
             Clear();
             Globals.WriteWithColor($"FILE VIEWER V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine("");
@@ -52,6 +58,68 @@ namespace MiniComputer
             }
             Globals.openFile = null;
             Clear();
+        }
+
+        public static void ImageViewer()
+        {
+            if (Globals.openFile == null) return;
+
+            Clear();
+            Globals.WriteWithColor($"IMAGE VIEWER V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
+            WriteLine("");
+
+            bool writen = false;
+
+            for (int i = 0; i < Globals.openFile.content.Count(); i++)
+            {
+                char[] colors = Globals.openFile.content[i].ToCharArray();
+
+                Write(" ");
+
+                for (int j = 0; j < colors.Length; j++)
+                {
+                    if (colors[j] == ' ') continue;
+
+                    int color;
+                    try 
+                    {
+                        color = Convert.ToInt32(colors[j].ToString(), 16);
+                    } catch 
+                    {
+                        Clear();
+                        Globals.WriteError($"'{Globals.openFile.content[i]}' on line {i}, character {j} not recognized.");
+                        return;
+                    }
+
+                    Pixel(color);
+                    writen = true;
+                }
+
+                WriteLine(" ");
+            }
+
+            if (writen == false)
+            {
+                WriteLine("File is empty.");
+            }
+
+            var keyInfo = ReadKey(true);
+            while (keyInfo.Key != ConsoleKey.Q)
+            {
+                keyInfo = ReadKey(true);
+            }
+            Globals.openFile = null;
+            Clear();
+        }
+
+        public static void Pixel(int color)
+        {
+            BackgroundColor = (ConsoleColor)color;
+            ForegroundColor = (ConsoleColor)color;
+
+            Write("mm");
+
+            ResetColor();
         }
     }
 
