@@ -55,7 +55,7 @@ namespace MiniComputer
     class File : Item
     {
         public string extension = "txt";
-        public List<string> content = new List<string>() { " " };
+        public List<string> content = new List<string>() { "" };
 
         public File(string newName, Directory[] newPath)
         {

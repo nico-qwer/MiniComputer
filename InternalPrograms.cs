@@ -79,11 +79,13 @@ namespace MiniComputer
                 for (int j = 0; j < colors.Length; j++)
                 {
                     if (colors[j] == ' ') continue;
+                    if (colors[j] == ';') { WriteLine(" "); continue; }
 
                     int color;
                     try 
                     {
                         color = Convert.ToInt32(colors[j].ToString(), 16);
+
                     } catch 
                     {
                         Clear();
@@ -94,8 +96,6 @@ namespace MiniComputer
                     Pixel(color);
                     writen = true;
                 }
-
-                WriteLine(" ");
             }
 
             if (writen == false)
@@ -172,7 +172,7 @@ namespace MiniComputer
                         break;
 
                     case ConsoleKey.N:
-                        Globals.openFile.content.Add(" ");
+                        Globals.openFile.content.Add("");
                         break;
 
                     case ConsoleKey.Backspace:
@@ -206,43 +206,76 @@ namespace MiniComputer
             if (Globals.openFile == null) return;
             if (line < 0 || line >= Globals.openFile.content.Count()) return;
 
-            Clear();
-            Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
-            WriteLine("");
-            Write(line + " | " + Globals.openFile.content[line]);
-
             string? newLine = Globals.openFile.content[line];
 
             bool exit = false;
             int charCount = Globals.openFile.content[line].Length;
+            int insertChar = charCount;
+
+            RefreshLine(line, insertChar, newLine);
+
             while (exit == false)
             {
                 ConsoleKeyInfo newLetter = ReadKey(true);
 
-                if (newLetter.Key == ConsoleKey.Backspace)
+                switch(newLetter.Key)
                 {
-                    if (charCount == 0) continue;
+                    case ConsoleKey.Backspace:
+                        if (charCount == 0) continue;
 
-                    Write("\b \b");
-                    newLine = newLine.Remove(newLine.Length - 1);
-                    charCount--;
-                }
-                else if (newLetter.Key == ConsoleKey.Enter)
-                {
-                    WriteLine("Pressed enter");
-                    exit = true;
-                }
-                else
-                {
-                    Write(newLetter.KeyChar.ToString());
-                    newLine += newLetter.KeyChar.ToString();
-                    charCount++;
+                        newLine = newLine.Remove(insertChar - 1, 1);
+
+                        charCount--;
+                        insertChar--;
+
+                        RefreshLine(line, insertChar - 1, newLine);
+
+                        break;
+                
+                    case ConsoleKey.Enter:
+                        exit = true;
+                        break;
+                
+                    case ConsoleKey.LeftArrow:
+                  
+                        if (Console.CursorLeft <= line.ToString().Length + 4) continue;
+                        Console.CursorLeft = Console.CursorLeft - 1;
+                        insertChar--;
+                        break;
+                
+                    case ConsoleKey.RightArrow:
+                        if (Console.CursorLeft >= line.ToString().Length + 4 + newLine.Length) continue;
+                        Console.CursorLeft = Console.CursorLeft + 1;
+                        insertChar++;
+                        break;
+                
+                    default:
+
+                        string newLine_ = newLine.Insert(insertChar, newLetter.KeyChar.ToString());
+                        newLine = newLine_;
+
+                        RefreshLine(line, insertChar, newLine);
+
+                        charCount++;
+                        insertChar++;
+                        break;
                 }
             }
 
-            if (newLine == null) newLine = " ";
+            if (newLine == null) newLine = "";
             Globals.openFile.content[line] = newLine;
             WriteLine(newLine);
+        }
+
+        static void RefreshLine(int line, int cursor, string text)
+        {
+            if (Globals.openFile == null) return;
+
+            Clear();
+            Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
+            WriteLine("");
+            Write(line + " | " + text);
+            Console.CursorLeft = cursor + line.ToString().Length + 4;
         }
 
         static void Refresh()
