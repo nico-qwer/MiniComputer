@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 using static System.Console;
 
@@ -23,8 +24,22 @@ namespace MiniComputer
             {
                 ImageViewer();
                 return;
+            } 
+            else if(Globals.openFile.extension == "cod")
+            {
+                CodeExecuter();
+                return;
             }
+            else
+            {
+                TextViewer();
+                return;
+            }
+        }
 
+        public static void TextViewer()
+        {
+            if (Globals.openFile == null) return;
             Clear();
             Globals.WriteWithColor($"FILE VIEWER V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine("");
@@ -112,6 +127,30 @@ namespace MiniComputer
             Clear();
         }
 
+        public static void CodeExecuter()
+        {
+            if (Globals.openFile == null) return;
+
+            
+
+
+            for (int i = 0; i < Globals.openFile.content.Count(); i++)
+            {
+                string[] tokens = Globals.openFile.content[i].Split(" ");
+
+                switch (tokens[0]) 
+                {
+                    case "var":
+                        
+                        break;
+
+                    default :
+                       
+                        break;
+                }
+            }
+        }
+
         public static void Pixel(int color)
         {
             BackgroundColor = (ConsoleColor)color;
@@ -138,10 +177,6 @@ namespace MiniComputer
             {
                 Globals.WriteError("No such file exists.");
                 return;
-            } else if (Globals.openFile.extension == "img")
-            {
-                Globals.WriteError("Cannot edit 'img' file. Change it back to 'txt' format to edit it.");
-                return;
             }
 
             Refresh();
@@ -165,6 +200,13 @@ namespace MiniComputer
                         
                     case ConsoleKey.Q:
                         exit = true;
+
+                        for(int i = Globals.openFile.content.Count() - 1; i >= 0 ; i--) 
+                        {
+                            if (Globals.openFile.content[i] == "") Globals.openFile.content.RemoveAt(i);
+                            else break;
+                        }
+
                         break;
                         
                     case ConsoleKey.Enter:
@@ -212,6 +254,9 @@ namespace MiniComputer
             int charCount = Globals.openFile.content[line].Length;
             int insertChar = charCount;
 
+            Clear();
+            Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
+            Write(" \n" + line + " | ");
             RefreshLine(line, insertChar, newLine);
 
             while (exit == false)
@@ -244,7 +289,7 @@ namespace MiniComputer
                         break;
                 
                     case ConsoleKey.RightArrow:
-                        if (Console.CursorLeft >= line.ToString().Length + 4 + newLine.Length) continue;
+                        if (Console.CursorLeft >= line.ToString().Length + 4 + newLine.Length - 1) continue;
                         Console.CursorLeft = Console.CursorLeft + 1;
                         insertChar++;
                         break;
@@ -263,6 +308,14 @@ namespace MiniComputer
             }
 
             if (newLine == null) newLine = "";
+            
+            char[] characters = newLine.ToCharArray();
+            for(int i = characters.Length - 1; i >= 0 ; i--) 
+            {
+                if (characters[i] == ' ') newLine.Remove(newLine.Length - 1); //Write(i);}
+                else break;
+            }
+
             Globals.openFile.content[line] = newLine;
             WriteLine(newLine);
         }
@@ -271,11 +324,13 @@ namespace MiniComputer
         {
             if (Globals.openFile == null) return;
 
-            Clear();
-            Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
-            WriteLine("");
-            Write(line + " | " + text);
-            Console.CursorLeft = cursor + line.ToString().Length + 4;
+            CursorLeft = 0;
+            Write(new string(' ', BufferWidth));
+            CursorTop = CursorTop - 1;
+
+            Write(line + " | ");
+            Write(text);
+            CursorLeft = cursor + line.ToString().Length + 4;
         }
 
         static void Refresh()
@@ -314,6 +369,49 @@ namespace MiniComputer
             {
                 Write("0 | ");
             }
+        }
+    }
+
+    class Variable
+    {
+        string name;
+        string type;
+        string value;
+
+        Variable(string newName, string newValue)
+        {
+            name = newName;
+            
+            if (int.TryParse(newValue, out _))
+            {
+                type = "Int";
+            }
+
+            //Negativity Removal
+            string absValue = newValue;
+            char[] valueChars = newValue.ToCharArray();
+            if (valueChars[0] == '-')
+            {
+                absValue.Remove(0,1);
+            }
+
+            //Int test
+            if (float.TryParse(newValue, out _) || float.TryParse(newValue.Replace('.', ','), out _))
+            {
+                type = "Num";
+            }
+            //Bool test
+            else if (newValue == "true" || newValue == "false")
+            {
+                type = "bool";
+            }
+            //String default
+            else
+            {
+                type = "string";
+            }
+
+            value = newValue;
         }
     }
 }
