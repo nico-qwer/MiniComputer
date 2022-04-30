@@ -142,7 +142,7 @@ namespace MiniComputer
 
                     Rename(arguments[0], arguments[1]);
                     break;
-                
+
                 default:
                     Globals.WriteError("No such command exists.");
                     break;
@@ -170,7 +170,7 @@ namespace MiniComputer
         public static void CreateDirectory(string dirName)
         {
             if (dirName == null || dirName == "") { Globals.WriteError("Cannot create directory with no name."); return; }
-            
+
             if (File.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
             if (Directory.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
 
@@ -198,7 +198,7 @@ namespace MiniComputer
         public static void Delete(string name)
         {
             int idx = name.LastIndexOf('.');
-            if (idx != -1)name = name[..idx];
+            if (idx != -1) name = name[..idx];
 
             Item.DeleteItem(name, Globals.currentPath);
         }
