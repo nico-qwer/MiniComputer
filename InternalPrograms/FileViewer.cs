@@ -25,7 +25,7 @@ namespace MiniComputer
             }
             else if (Globals.openFile.extension == "cod")
             {
-                CodeExecuter();
+                Interpreter.Run();
                 return;
             }
             else

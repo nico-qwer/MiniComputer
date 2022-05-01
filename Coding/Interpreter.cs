@@ -23,7 +23,7 @@ namespace MiniComputer
 
                 switch (tokens[0])
                 {
-                    //Variable Creationiable Creation
+                    //Variable Creation
                     case "var":
                         if (tokens[1] == null || tokens[1] == "")
                         {
@@ -38,6 +38,7 @@ namespace MiniComputer
                         }
 
                         Variable newVariable = new Variable(tokens[1], tokens[3]);
+
                         if (newVariable.type == "invalid")
                         {
                             Globals.WriteError($"{line}: Variable assignment invalid.");
@@ -50,7 +51,6 @@ namespace MiniComputer
                     case "out":
                         Output(line, 0, tokens, variables);
                         break;
-
                     case "if":
 
 
@@ -69,43 +69,43 @@ namespace MiniComputer
 
         static void Output(int line, int mod, string[] tokens, List<Variable> variables)
         {
+
             if (tokens.Length < 2 + mod)
             {
+                if (mod == 0) Write("\n");
                 Globals.WriteError($"{line}: Argument(s) invalid.");
+                return;
+            }
+            //If String
+            if (tokens[1 + mod].StartsWith('"') && tokens[1 + mod].EndsWith('"'))
+            {
+                Write(tokens[1 + mod].Substring(1, tokens[1 + mod].Length - 2));
 
-                //If Stringf String
-                if (tokens[1 + mod].StartsWith('"') && tokens[1 + mod].EndsWith('"'))
+                if (tokens.Length > 2 + mod && tokens[2 + mod] == "+")
                 {
-                    Write(tokens[1 + mod].Substring(1, tokens[1 + mod].Length - 2));
-
-                    if (tokens.Length > 2 + mod && tokens[2 + mod] == "+")
-                    {
-                        Output(line, 2 + mod, tokens, variables);
-                    }
-
-                    //If variablevariable
-                    else if (tokens[1 + mod].StartsWith('$'))
-                    {
-                        bool found = false;
-                        for (int j = 0; j < variables.Count(); j++)
-                        {
-                            if (variables[j].name != tokens[1 + mod].Remove(0, 1)) continue;
-                            Write(variables[j].value);
-                            found = true;
-                            break;
-                        }
-                        if (found == false) { Globals.WriteError($"{line}: Variable not found."); return; }
-
-                        if (tokens.Length > 2 + mod && tokens[2 + mod] == "+")
-                        {
-                            Output(line, 2 + mod, tokens, variables);
-                        }
-
-                        //If nothing nothing
-                        else { Globals.WriteError($"{line}: Argument {tokens[1 + mod]} invalid."); return; }
-                    }
+                    Output(line, 2 + mod, tokens, variables);
                 }
             }
+            //If variable
+            else if (tokens[1 + mod].StartsWith('$'))
+            {
+                bool found = false;
+                for (int j = 0; j < variables.Count(); j++)
+                {
+                    if (variables[j].name != tokens[1 + mod].Remove(0, 1)) continue;
+                    Write(variables[j].value);
+                    found = true;
+                    break;
+                }
+                if (found == false) { Globals.WriteError($"{line}: Variable not found."); return; }
+
+                if (tokens.Length > 2 + mod && tokens[2 + mod] == "+")
+                {
+                    Output(line, 2 + mod, tokens, variables);
+                }
+            }
+            //If nothing
+            else { Globals.WriteError($"{line}: Argument {tokens[1 + mod]} invalid."); return; }
         }
     }
 }
