@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Text.RegularExpressions;
 using static System.Console;
 
 namespace MiniComputer
@@ -10,6 +10,7 @@ namespace MiniComputer
         static void Main(string[] args)
         {
             Title = "MiniComputer";
+            SaveSystem.LoadPath();
 
             while (true)
             {
@@ -151,11 +152,8 @@ namespace MiniComputer
 
         public static void CreateFile(string fileName)
         {
-            if (fileName == null || fileName == "")
-            {
-                Globals.WriteError("Cannot create file with no name.");
-                return;
-            }
+            if (fileName == null || fileName == "") { Globals.WriteError("Cannot create file with no name."); return; }
+            if (fileName.Contains("+")) { Globals.WriteError("Invalid file name."); return; }
 
             int count = fileName.Split('.').Length - 1;
             if (count > 1) { Globals.WriteError("Cannot have multiple file extensions."); return; }
@@ -170,6 +168,7 @@ namespace MiniComputer
         public static void CreateDirectory(string dirName)
         {
             if (dirName == null || dirName == "") { Globals.WriteError("Cannot create directory with no name."); return; }
+            if (dirName.Contains("+")) { Globals.WriteError("Invalid directory name."); return; }
 
             if (File.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
             if (Directory.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
@@ -183,12 +182,11 @@ namespace MiniComputer
 
         public static void Rename(string oldName, string newName)
         {
+            if (newName.Contains("+")) { Globals.WriteError("Invalid file name."); return; }
+
             File? toRename = File.FindInChildren(oldName, Globals.currentPath);
-            if (toRename == null)
-            {
-                Globals.WriteError("No such file exists.");
-                return;
-            }
+            if (toRename == null) { Globals.WriteError("No such file exists."); return; }
+
             string oldExtension = toRename.extension;
 
             toRename.Rename(newName);
