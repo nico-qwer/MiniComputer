@@ -11,6 +11,7 @@ namespace MiniComputer
         {
             Title = "MiniComputer";
             SaveSystem.LoadPath();
+            SaveSystem.Load();
 
             while (true)
             {
@@ -142,6 +143,10 @@ namespace MiniComputer
                     }
 
                     Rename(arguments[0], arguments[1]);
+                    break;
+
+                case "save":
+                    SaveSystem.Dump();
                     break;
 
                 default:

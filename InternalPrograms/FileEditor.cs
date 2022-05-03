@@ -51,9 +51,6 @@ namespace MiniComputer
                         }
 
                         break;
-                    case ConsoleKey.S:
-                        SaveSystem.SaveFile(Globals.openFile);
-                        break;
 
                     case ConsoleKey.Enter:
                         LineEdit(selectedLine);
@@ -76,8 +73,6 @@ namespace MiniComputer
 
                 Refresh();
             }
-
-            SaveSystem.SaveFile(Globals.openFile);
 
             Globals.openFile = null;
             Clear();

@@ -4,14 +4,20 @@ namespace MiniComputer
 {
     class File : Item
     {
+        public static int currentID = 0;
+        public static List<File> allFiles = new List<File>();
         public string extension = "txt";
         public List<string> content = new List<string>() { "" };
+        public int ID;
 
         public File(string newName, Directory[] newPath)
         {
             Rename(newName);
             path = newPath;
+            ID = currentID;
+            currentID++;
             path.Last().files.Add(this);
+            allFiles.Add(this);
         }
 
         public void Rename(string newName)

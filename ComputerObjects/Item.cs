@@ -14,6 +14,7 @@ namespace MiniComputer
             {
                 if (_path.Last().directories[i].name != _name) continue;
                 _path.Last().directories.RemoveAt(i);
+                Directory.allDirectories.Remove(_path.Last().directories[i]);
                 WriteLine($"Successfuly deleted {_name} and it's contents from {_path.Last().name}.");
                 return;
             }
@@ -21,6 +22,7 @@ namespace MiniComputer
             {
                 if (_path.Last().files[i].name != _name) continue;
                 _path.Last().files.RemoveAt(i);
+                File.allFiles.Remove(_path.Last().files[i]);
                 WriteLine($"Successfuly deleted {_name} from {_path.Last().name}.");
                 return;
             }

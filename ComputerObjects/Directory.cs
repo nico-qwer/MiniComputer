@@ -5,16 +5,22 @@ namespace MiniComputer
 {
     class Directory : Item
     {
+        public static int currentID = 0;
+        public static List<Directory> allDirectories = new List<Directory>();
         public List<Directory> directories = new List<Directory>();
         public List<File> files = new List<File>();
+        public int ID;
 
         public Directory(string newName, Directory[] newPath)
         {
             Rename(newName);
             path = newPath;
+            ID = currentID;
+            currentID++;
 
             if (newName == Globals.rootDirName) return;
             newPath.Last().directories.Add(this);
+            allDirectories.Add(this);
         }
 
         public static Directory[] FindPath(string[] _path)
