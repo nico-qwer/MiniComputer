@@ -43,7 +43,7 @@ namespace MiniComputer
             return toWrite;
         }
 
-        public static async void Dump()
+        public static async void Dump(string saveName)
         {
             if (filesPath == null || saveFilePath == null) return;
 
@@ -67,6 +67,40 @@ namespace MiniComputer
 
         public static void Load()
         {
+            string[] saveFiles = Directory.GetFiles(filesPath)
+            int selectedFile = 0;
+
+            while (hasBeenSelected == false)
+            {
+                Clear();
+                WriteLine("Save file to load:");
+            
+                for (int i = 0; i < saveFiles.Length; i++;)
+                {
+                    if (selectedFile == i) Globals.WriteWithColor(saveFiles[i].Split(@"\").Last());
+                    else WriteLine(saveFiles[i].Split(@"\").Last());
+                }
+
+                ConsoleKeyInfo keyInfo = ReadKey(true);
+
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        if (selectedFile <= 0) break;
+                        selectedFile--;
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        if (selectedFile >= saveFiles.Length - 1) break;
+                        selectedFile++;
+                        break;
+
+                    case ConsoleKey.Enter:
+                        saveFilePath = saveFiles[i];
+                        break;
+                }
+            }
+
             if (filesPath == null || saveFilePath == null) return;
             string[] lines = System.IO.File.ReadAllLines(saveFilePath);
 
@@ -228,14 +262,6 @@ namespace MiniComputer
             if (System.IO.Directory.Exists(filesPath) == false)
             {
                 System.IO.Directory.CreateDirectory(filesPath);
-            }
-
-            saveFilePath = Path.Combine(filesPath, "SaveFile.txt");
-
-            if (System.IO.File.Exists(saveFilePath) == false)
-            {
-                FileStream stream = System.IO.File.Create(saveFilePath);
-                stream.Close();
             }
         }
     }
