@@ -6,7 +6,7 @@ namespace MiniComputer
     class Globals
     {
         public static string rootDirName = "Main";
-        public static Directory rootDirectory = new Directory(rootDirName, new Directory[0]);
+        public static Directory rootDirectory = new Directory(rootDirName, new Directory[0], File.currentID);
         public static Directory[] currentPath = new Directory[1] { Globals.rootDirectory };
         public static File? openFile;
         public static void WriteError(string text)

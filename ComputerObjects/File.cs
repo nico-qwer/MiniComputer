@@ -10,11 +10,11 @@ namespace MiniComputer
         public List<string> content = new List<string>() { "" };
         public int ID;
 
-        public File(string newName, Directory[] newPath)
+        public File(string newName, Directory[] newPath, int newID)
         {
             Rename(newName);
             path = newPath;
-            ID = currentID;
+            ID = newID;
             currentID++;
             path.Last().files.Add(this);
             allFiles.Add(this);

@@ -5,6 +5,7 @@ namespace MiniComputer
 {
     class Interpreter
     {
+        static string[]? fileContent;
         static List<Variable> variables = new List<Variable>();
         static List<string> processes = new List<string>();
         static int line = 0;
@@ -13,10 +14,18 @@ namespace MiniComputer
         {
             if (Globals.openFile == null) return;
 
-            for (line = 0; line < Globals.openFile.content.Count(); line++)
+            fileContent = Globals.openFile.content.ToArray();
+
+            for (line = 0; line < fileContent.Count(); line++)
             {
-                string unIndentedLine = Globals.openFile.content[line].Replace("\t", "");
-                string[] tokens = unIndentedLine.Split(" ");
+                char[] characters = fileContent[line].ToCharArray();
+                for (int j = 0; j < characters.Length; j++)
+                {
+                    if (characters[j] == ' ') fileContent[line].Remove(0, 1);
+                    else break;
+                }
+
+                string[] tokens = fileContent[line].Split(" ");
 
                 /*for (int j = 0; j < tokens.Length; j++)
 				{

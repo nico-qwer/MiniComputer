@@ -12,6 +12,7 @@ namespace MiniComputer
             Title = "MiniComputer";
             SaveSystem.LoadPath();
             SaveSystem.Load();
+            WriteLine("\n==================== Booted! ====================\n");
 
             while (true)
             {
@@ -51,11 +52,11 @@ namespace MiniComputer
 
                     if (arguments[0].ToLower() == "dir" || arguments[0].ToLower() == "directory")
                     {
-                        CreateDirectory(arguments[1]);
+                        CreateDirectory(arguments[1], Globals.currentPath, Directory.currentID);
                     }
                     else if (arguments[0].ToLower() == "file")
                     {
-                        CreateFile(arguments[1]);
+                        CreateFile(arguments[1], Globals.currentPath, File.currentID);
                     }
                     else
                     {
@@ -147,6 +148,7 @@ namespace MiniComputer
 
                 case "save":
                     SaveSystem.Dump();
+                    WriteLine($"Sucessfully saved all data to <{SaveSystem.saveFilePath}>");
                     break;
 
                 default:
@@ -155,34 +157,35 @@ namespace MiniComputer
             }
         }
 
-        public static void CreateFile(string fileName)
+        public static File? CreateFile(string fileName, Directory[] newPath, int newID, bool show = true)
         {
-            if (fileName == null || fileName == "") { Globals.WriteError("Cannot create file with no name."); return; }
-            if (fileName.Contains("+")) { Globals.WriteError("Invalid file name."); return; }
+            if (fileName == null || fileName == "") { Globals.WriteError("Cannot create file with no name."); return null; }
 
             int count = fileName.Split('.').Length - 1;
-            if (count > 1) { Globals.WriteError("Cannot have multiple file extensions."); return; }
+            if (count > 1) { Globals.WriteError("Cannot have multiple file extensions."); return null; }
 
-            if (File.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
-            if (Directory.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
+            if (File.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return null; }
+            if (Directory.FindInChildren(fileName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return null; }
 
-            File newFile = new File(fileName, Globals.currentPath);
-            WriteLine($"Created file {newFile.name}.{newFile.extension}");
+            File newFile = new File(fileName, newPath, newID);
+            if (show == true) WriteLine($"Created file {newFile.name}.{newFile.extension}");
+            return newFile;
         }
 
-        public static void CreateDirectory(string dirName)
+        public static Directory? CreateDirectory(string dirName, Directory[] newPath, int newID, bool show = true)
         {
-            if (dirName == null || dirName == "") { Globals.WriteError("Cannot create directory with no name."); return; }
-            if (dirName.Contains("+")) { Globals.WriteError("Invalid directory name."); return; }
+            if (dirName == null || dirName == "") { Globals.WriteError("Cannot create directory with no name."); return null; }
+            if (dirName.Contains("+")) { Globals.WriteError("Invalid directory name."); return null; }
 
-            if (File.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
-            if (Directory.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return; }
+            if (File.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return null; }
+            if (Directory.FindInChildren(dirName, Globals.currentPath) != null) { Globals.WriteError("Name is already used."); return null; }
 
-            Directory newDir = new Directory(dirName, Globals.currentPath);
+            Directory newDir = new Directory(dirName, Globals.currentPath, newID);
 
-            ChangeDirectory(dirName);
+            if (show == true) ChangeDirectory(dirName);
+            if (show == true) WriteLine("Created directory " + newDir.name);
 
-            WriteLine("Created directory " + newDir.name);
+            return newDir;
         }
 
         public static void Rename(string oldName, string newName)

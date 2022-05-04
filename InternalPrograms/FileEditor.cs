@@ -12,6 +12,7 @@ namespace MiniComputer
 
         public static void EditFile(string name, Directory[] filePath)
         {
+            selectedLine = 0;
             int idx = name.LastIndexOf('.');
             if (idx != -1) name = name[..idx];
 
@@ -60,8 +61,12 @@ namespace MiniComputer
                         Globals.openFile.content.Add("");
                         break;
 
+                    case ConsoleKey.S:
+                        SaveSystem.Dump();
+                        break;
+
                     case ConsoleKey.Backspace:
-                        if (Globals.openFile.content.Count() > 0)
+                        if (Globals.openFile.content.Count() > 1)
                         {
                             Globals.openFile.content.RemoveAt(Globals.openFile.content.Count - 1);
                         }
@@ -74,6 +79,7 @@ namespace MiniComputer
                 Refresh();
             }
 
+            selectedLine = 0;
             Globals.openFile = null;
             Clear();
         }
@@ -100,7 +106,7 @@ namespace MiniComputer
             Clear();
             Globals.WriteWithColor($"FILE EDITOR V0.1.0 | {Globals.openFile.name}.{Globals.openFile.extension}", ConsoleColor.White, ConsoleColor.Black);
             Write(" \n" + line + " | ");
-            RefreshLine(line, insertChar, newLine);
+            RefreshLine(line, insertChar - 1, newLine);
 
             while (exit == false)
             {
@@ -155,7 +161,7 @@ namespace MiniComputer
             char[] characters = newLine.ToCharArray();
             for (int i = characters.Length - 1; i >= 0; i--)
             {
-                if (characters[i] == ' ') newLine.Remove(newLine.Length - 1); //Write(i);}
+                if (characters[i] == ' ') newLine.Remove(newLine.Length - 1);
                 else break;
             }
 

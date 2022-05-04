@@ -11,11 +11,11 @@ namespace MiniComputer
         public List<File> files = new List<File>();
         public int ID;
 
-        public Directory(string newName, Directory[] newPath)
+        public Directory(string newName, Directory[] newPath, int newID)
         {
             Rename(newName);
             path = newPath;
-            ID = currentID;
+            ID = newID;
             currentID++;
 
             if (newName == Globals.rootDirName) return;
