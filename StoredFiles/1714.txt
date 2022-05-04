@@ -1,0 +1,39 @@
+DIRECTORIES:
+{
+    1
+    idiot
+    Main
+}
+{
+    2
+    stupid
+    Main
+}
+FILES:
+{
+    0
+    Hello.txt
+    Main
+    c======
+    Hello World!
+    
+    no for real
+    12345
+}
+{
+    1
+    square.img
+    Main
+    c======
+    AAAA;
+    A00A;
+    A00A;
+    AAAA;
+}
+{
+    2
+    ha.txt
+    Main/stupid
+    c======
+    hahahahhahahahahahahhaha
+}

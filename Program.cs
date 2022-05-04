@@ -10,8 +10,10 @@ namespace MiniComputer
         static void Main(string[] args)
         {
             Title = "MiniComputer";
+
             SaveSystem.LoadPath();
             SaveSystem.Load();
+
             WriteLine("\n==================== Booted! ====================\n");
 
             while (true)
@@ -147,8 +149,21 @@ namespace MiniComputer
                     break;
 
                 case "save":
-                    SaveSystem.Dump();
-                    WriteLine($"Sucessfully saved all data to <{SaveSystem.saveFilePath}>");
+                    if (arguments.Length < 1 || arguments[0] == null)
+                    {
+                        if (SaveSystem.saveFilePath != null)
+                        {
+                            SaveSystem.Dump(null);
+                            WriteLine($"Sucessfully saved all data to <{SaveSystem.saveFilePath}>");
+                        }
+                        else Globals.WriteError("No save file recorded. Write a name after the save command.");
+                    }
+                    else
+                    {
+                        SaveSystem.Dump(arguments[0]);
+                        WriteLine($"Sucessfully saved all data to <{SaveSystem.saveFilePath}>");
+                    }
+
                     break;
 
                 default:
@@ -220,7 +235,7 @@ namespace MiniComputer
                 }
                 dirName = FormatPath(Globals.currentPath[Globals.currentPath.Length - 1].path);
             }
-            Directory[] newPath = UnFormatPath(dirName);
+            Directory[]? newPath = UnFormatPath(dirName);
             if (newPath == null) return;
 
             Globals.currentPath = newPath;
@@ -236,10 +251,10 @@ namespace MiniComputer
             }
             return output;
         }
-        public static Directory[] UnFormatPath(string path)
+        public static Directory[]? UnFormatPath(string path)
         {
             string[] splitedPath = path.Split("/");
-            Directory[] output = default!;
+            Directory[]? output = null;
 
             if (splitedPath.Length == 1 && splitedPath[0] != Globals.rootDirName)
             {

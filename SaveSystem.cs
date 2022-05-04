@@ -43,9 +43,23 @@ namespace MiniComputer
             return toWrite;
         }
 
-        public static async void Dump(string saveName)
+        public static async void Dump(string? saveName)
         {
-            if (filesPath == null || saveFilePath == null) return;
+            if (filesPath == null!) { return; }
+
+            if (saveName != null)
+            {
+                if (saveName.IndexOfAny(Path.GetInvalidFileNameChars()) > 0)
+                {
+                    Globals.WriteError(@$"File name '{saveName}' is not valid. File names cannot include these characters: "" * < > \ | / :");
+                    return;
+                }
+                else if (saveName.EndsWith('.') || saveName.EndsWith(' '))
+                {
+                    Globals.WriteError($"File name '{saveName}' is not valid. File names cannot end with a space or a period.");
+                    return;
+                }
+            }
 
             List<string> toWrite = new List<string>();
 
@@ -62,51 +76,66 @@ namespace MiniComputer
                 toWrite.AddRange(FormatFile(File.allFiles[i]));
             }
 
+            if (saveName != null) { saveFilePath = System.IO.Path.Combine(filesPath, saveName) + ".txt"; }
+
+            if (saveFilePath == null) return;
+
             await System.IO.File.WriteAllLinesAsync(saveFilePath, toWrite);
         }
 
         public static void Load()
         {
-            string[] saveFiles = Directory.GetFiles(filesPath)
-            int selectedFile = 0;
+            if (filesPath == null) return;
+            string[] saveFiles = System.IO.Directory.GetFiles(filesPath);
 
-            while (hasBeenSelected == false)
+            if (saveFiles.Length == 0) { WriteLine("No save file recorded."); return; }
+            else if (saveFiles.Length == 1) { WriteLine($"Only one save file, loading from {saveFiles[0].Split(@"\").Last()}."); saveFilePath = saveFiles[0]; }
+            else
             {
+                int selectedFile = 0;
+                bool hasBeenSelected = false;
+
+                while (hasBeenSelected == false)
+                {
+                    Clear();
+                    WriteLine("Save file to load:");
+
+                    for (int i = 0; i < saveFiles.Length; i++)
+                    {
+                        if (selectedFile == i) Globals.WriteWithColor(saveFiles[i].Split(@"\").Last(), ConsoleColor.White, ConsoleColor.Black);
+                        else WriteLine(saveFiles[i].Split(@"\").Last());
+                    }
+
+                    ConsoleKeyInfo keyInfo = ReadKey(true);
+
+                    switch (keyInfo.Key)
+                    {
+                        case ConsoleKey.UpArrow:
+                            if (selectedFile <= 0) break;
+                            selectedFile--;
+                            break;
+
+                        case ConsoleKey.DownArrow:
+                            if (selectedFile >= saveFiles.Length - 1) break;
+                            selectedFile++;
+                            break;
+
+                        case ConsoleKey.Enter:
+                            saveFilePath = saveFiles[selectedFile];
+                            hasBeenSelected = true;
+                            break;
+                    }
+                }
+
                 Clear();
-                WriteLine("Save file to load:");
-            
-                for (int i = 0; i < saveFiles.Length; i++;)
-                {
-                    if (selectedFile == i) Globals.WriteWithColor(saveFiles[i].Split(@"\").Last());
-                    else WriteLine(saveFiles[i].Split(@"\").Last());
-                }
-
-                ConsoleKeyInfo keyInfo = ReadKey(true);
-
-                switch (keyInfo.Key)
-                {
-                    case ConsoleKey.UpArrow:
-                        if (selectedFile <= 0) break;
-                        selectedFile--;
-                        break;
-
-                    case ConsoleKey.DownArrow:
-                        if (selectedFile >= saveFiles.Length - 1) break;
-                        selectedFile++;
-                        break;
-
-                    case ConsoleKey.Enter:
-                        saveFilePath = saveFiles[i];
-                        break;
-                }
             }
 
-            if (filesPath == null || saveFilePath == null) return;
+            if (saveFilePath == null) return;
             string[] lines = System.IO.File.ReadAllLines(saveFilePath);
 
             if (lines.Length < 2) return;
 
-            //if (lines[0] != "DIRECTORIES:") { Globals.WriteError($"Save file invalid at line 0:{lines[0]}"); return; }
+            if (lines[0] != "DIRECTORIES:") { Globals.WriteError($"Save file invalid at line 0:{lines[0]}"); return; }
 
             string currentlyLoading = "Directories";
 
@@ -115,7 +144,7 @@ namespace MiniComputer
             //bool foundDirectory = false;
             string newName = "";
             int newID = 0;
-            Directory[] newPath = new Directory[1] { Globals.rootDirectory };
+            Directory[]? newPath = new Directory[1] { Globals.rootDirectory };
 
             //File loading
             List<string> newFileContent = new List<string>();
@@ -168,10 +197,12 @@ namespace MiniComputer
                     if (i == recordStart + 3)
                     {
                         newPath = Program.UnFormatPath(currentLine);
+                        if (newPath == null) { Globals.WriteError($"Save file invalid at line {i}: {currentLine}"); return; }
                     }
                     //Detects end of directory creation
                     if (currentLine == "}")
                     {
+                        if (newPath == null) { Globals.WriteError($"Save file invalid at line {i}: {currentLine}"); return; }
                         Directory? newDirectory = Program.CreateDirectory(newName, newPath, newID, false);
                         if (newDirectory == null) return;
 
@@ -227,6 +258,7 @@ namespace MiniComputer
                     //Detects end of file creation
                     if (currentLine == "}")
                     {
+                        if (newPath == null) { Globals.WriteError($"Save file invalid at line {i}: {currentLine}"); return; }
                         File? newFile = Program.CreateFile(newName, newPath, newID, false);
 
                         if (newFile == null) return;

@@ -61,10 +61,6 @@ namespace MiniComputer
                         Globals.openFile.content.Add("");
                         break;
 
-                    case ConsoleKey.S:
-                        SaveSystem.Dump();
-                        break;
-
                     case ConsoleKey.Backspace:
                         if (Globals.openFile.content.Count() > 1)
                         {

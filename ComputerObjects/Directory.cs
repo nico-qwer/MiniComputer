@@ -23,7 +23,7 @@ namespace MiniComputer
             allDirectories.Add(this);
         }
 
-        public static Directory[] FindPath(string[] _path)
+        public static Directory[]? FindPath(string[] _path)
         {
             Directory[] output = new Directory[_path.Length];
             output[0] = Globals.rootDirectory;
@@ -38,7 +38,11 @@ namespace MiniComputer
                         output[i] = output[i - 1].directories[j];
                         break;
                     }
+                }
+                if (output[i] == null)
+                {
                     Globals.WriteError("No such directory exists.");
+                    return null;
                 }
             }
 
