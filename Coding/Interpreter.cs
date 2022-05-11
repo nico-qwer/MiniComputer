@@ -27,17 +27,14 @@ namespace MiniComputer
 
                 string[] tokens = fileContent[line].Split(" ");
 
-                /*for (int j = 0; j < tokens.Length; j++)
-				{
-					WriteLine(tokens[j]);
-				}*/
-
-                if (tokens[0] == ";")
+                if (processes.Count() > 0)
                 {
-                    processes.RemoveAt(processes.Count() - 1);
+                    if (tokens[0] == ";") processes.RemoveAt(processes.Count() - 1);
+                    else if (tokens[0] == "if" && processes.Last() == "skip") processes.Add("skip");
+                    else if (tokens[0] == "while" && processes.Last() == "skip") processes.Add("skip");
+                    else if (Int32.TryParse(processes.Last(), out line)) { continue; }
+                    else if (processes.Last() == "skip") continue;
                 }
-
-                if (processes.Count() > 0 && processes.Last() == "skip") continue;
 
                 switch (tokens[0])
                 {
@@ -52,7 +49,7 @@ namespace MiniComputer
                             if (variables[j].name == tokens[1]) { Globals.WriteError($"{line}: Variable already declared."); return; }
                         }
 
-                        Variable newVariable = new Variable(tokens[1], tokens[3]);
+                        Variable newVariable = new Variable(tokens[1], tokens.Skip(3).ToArray());
 
                         if (newVariable.type == "invalid")
                         {
@@ -68,10 +65,10 @@ namespace MiniComputer
                         break;
 
                     case "if":
-                        if (tokens.Length <= 1) { Globals.WriteError($"{line}: If arguments missing."); break; }
+                        if (tokens.Length <= 1) { Globals.WriteError($"{line}: Arguments missing."); break; }
 
                         bool? valueI = isTrue(tokens);
-                        if (valueI == null) { Globals.WriteError($"{line}: Variable not found."); break; }
+                        if (valueI == null) { Globals.WriteError($"{line}: Condition invalid."); break; }
 
                         if (valueI == false) processes.Add("skip");
                         else if (valueI == true) processes.Add("go");
@@ -79,10 +76,12 @@ namespace MiniComputer
                         break;
 
                     case "while":
-                        if (tokens.Length <= 1) { Globals.WriteError($"{line}: While arguments missing."); break; }
+                        if (tokens.Length <= 1) { Globals.WriteError($"{line}: Arguments missing."); break; }
+
+                        WriteLine("Hey!");
 
                         bool? valueW = isTrue(tokens);
-                        if (valueW == null) { Globals.WriteError($"{line}: Variable not found."); break; }
+                        if (valueW == null) { Globals.WriteError($"{line}: Condition invalid."); break; }
 
                         if (valueW == false) processes.Add("skip");
                         else if (valueW == true) processes.Add(line.ToString());
@@ -99,6 +98,9 @@ namespace MiniComputer
             }
 
             Write("\n");
+            variables = new List<Variable>();
+            processes = new List<string>();
+            line = 0;
         }
 
         static bool? isTrue(string[] tokens)
@@ -113,46 +115,38 @@ namespace MiniComputer
                 bool? value1 = IsStringTrue(tokens[2]);
                 bool? value2 = IsStringTrue(tokens[4]);
 
+                if (value1 == null || value2 == null) return null;
+
                 return value1 == value2;
+            }
+            else if (tokens.Length == 4 && tokens[3] == "!=")
+            {
+                bool? value1 = IsStringTrue(tokens[2]);
+                bool? value2 = IsStringTrue(tokens[4]);
+
+                if (value1 == null || value2 == null) return null;
+
+                return value1 != value2;
             }
 
             return null;
         }
+
         static void Output(int mod, string[] tokens)
         {
-
             if (tokens.Length < 2 + mod)
             {
                 if (mod == 0) Write("\n");
                 Globals.WriteError($"{line}: Argument(s) invalid.");
                 return;
             }
-            //If String
-            if (tokens[1 + mod].StartsWith('"') && tokens[1 + mod].EndsWith('"'))
-            {
-                Write(tokens[1 + mod].Substring(1, tokens[1 + mod].Length - 2));
 
-                if (tokens.Length > 2 + mod && tokens[2 + mod] == "+")
-                {
-                    Output(2 + mod, tokens);
-                }
-            }
-            //If variable
-            else if (tokens[1 + mod].StartsWith('$'))
-            {
+            WriteLine(GetString(tokens.Skip(1).ToArray()));
+        }
 
-                Variable? referencedVar = GetVariable(tokens[1 + mod].Remove(0, 1));
-                if (referencedVar == null) { Globals.WriteError($"{line}: Variable not found."); return; }
-
-                Write(referencedVar.value);
-
-                if (tokens.Length > 2 + mod && tokens[2 + mod] == "+")
-                {
-                    Output(2 + mod, tokens);
-                }
-            }
-            //If nothing
-            else { Globals.WriteError($"{line}: Argument {tokens[1 + mod]} invalid."); return; }
+        public static string? GetInput()
+        {
+            return ReadLine();
         }
 
         static Variable? GetVariable(string name)
@@ -166,22 +160,6 @@ namespace MiniComputer
             return null;
         }
 
-        static bool? StringToBool(string orgString)
-        {
-            if (orgString == "true")
-            {
-                return true;
-            }
-            else if (orgString == "false")
-            {
-                return false;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         static bool? IsStringTrue(string value)
         {
             if (value.StartsWith('$'))
@@ -190,17 +168,53 @@ namespace MiniComputer
                 if (referencedVar == null) { Globals.WriteError($"{line}: Variable not found."); return null; }
                 if (referencedVar.type != "bool") { Globals.WriteError($"{line}: Variable must be compared."); return null; }
 
-                bool? result = StringToBool(referencedVar.value);
-                if (result == null) { Globals.WriteError($"{line}: Variable assigned improperly."); return null; }
+                bool result;
+                if (Boolean.TryParse(referencedVar.value, out result) == false) { Globals.WriteError($"{line}: Variable assigned improperly."); return null; }
 
                 return result;
             }
             else
             {
-                bool? result = StringToBool(value);
-                if (result == null) { Globals.WriteError($"{line}: Unregognized token '{value}'."); return null; }
+                bool result;
+                if (Boolean.TryParse(value, out result) == false) { Globals.WriteError($"{line}: Unregognized token '{value}'."); return null; }
                 return result;
             }
         }
+
+        public static string GetString(string[] toGetFrom)
+        {
+            string output = "";
+            string newString = "";
+
+            if (toGetFrom.Length == 0) return output;
+
+            for (int i = 0; i < toGetFrom.Length; i++)
+            {
+                if (toGetFrom[i].StartsWith('$'))
+                {
+                    Variable? refVar = GetVariable(toGetFrom[i].Remove(0, 1));
+                    if (refVar == null) continue;
+                    output += refVar.value;
+                }
+                else if (newString == string.Empty && toGetFrom[i] == "get()")
+                {
+                    output += GetInput();
+                }
+                else if (toGetFrom[i].StartsWith('"'))
+                {
+                    if (toGetFrom[i].EndsWith('"')) output += toGetFrom[i].Substring(1, toGetFrom[i].Length - 2);
+                    else newString = toGetFrom[i].Remove(0, 1);
+                }
+                else if (newString != string.Empty)
+                {
+                    if (toGetFrom[i].EndsWith('"')) { output += newString + " " + toGetFrom[i].Remove(toGetFrom[i].Length - 1, 1); newString = ""; }
+                    else newString += " " + toGetFrom[i];
+                }
+            }
+
+            if (output == string.Empty) Globals.WriteError("String is empty");
+            return output;
+        }
+
     }
 }

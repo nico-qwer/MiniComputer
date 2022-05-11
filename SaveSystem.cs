@@ -89,7 +89,6 @@ namespace MiniComputer
             string[] saveFiles = System.IO.Directory.GetFiles(filesPath);
 
             if (saveFiles.Length == 0) { WriteLine("No save file recorded."); return; }
-            else if (saveFiles.Length == 1) { WriteLine($"Only one save file, loading from {saveFiles[0].Split(@"\").Last()}."); saveFilePath = saveFiles[0]; }
             else
             {
                 int selectedFile = 0;
@@ -100,10 +99,11 @@ namespace MiniComputer
                     Clear();
                     WriteLine("Save file to load:");
 
-                    for (int i = 0; i < saveFiles.Length; i++)
+                    for (int i = 0; i < saveFiles.Length + 1; i++)
                     {
-                        if (selectedFile == i) Globals.WriteWithColor(saveFiles[i].Split(@"\").Last(), ConsoleColor.White, ConsoleColor.Black);
-                        else WriteLine(saveFiles[i].Split(@"\").Last());
+                        string toDisplay = i == saveFiles.Length ? "none" : saveFiles[i].Split(@"\").Last();
+                        if (selectedFile == i) Globals.WriteWithColor(toDisplay, ConsoleColor.White, ConsoleColor.Black);
+                        else WriteLine(toDisplay);
                     }
 
                     ConsoleKeyInfo keyInfo = ReadKey(true);
@@ -116,11 +116,12 @@ namespace MiniComputer
                             break;
 
                         case ConsoleKey.DownArrow:
-                            if (selectedFile >= saveFiles.Length - 1) break;
+                            if (selectedFile >= saveFiles.Length) break;
                             selectedFile++;
                             break;
 
                         case ConsoleKey.Enter:
+                            if (selectedFile == saveFiles.Length) { Clear(); return; }
                             saveFilePath = saveFiles[selectedFile];
                             hasBeenSelected = true;
                             break;

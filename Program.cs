@@ -235,6 +235,11 @@ namespace MiniComputer
                 }
                 dirName = FormatPath(Globals.currentPath[Globals.currentPath.Length - 1].path);
             }
+            else if (dirName == "../")
+            {
+                dirName = Globals.rootDirName;
+            }
+
             Directory[]? newPath = UnFormatPath(dirName);
             if (newPath == null) return;
 

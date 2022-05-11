@@ -9,6 +9,11 @@ DIRECTORIES:
     stupid
     Main
 }
+{
+    3
+    documents
+    Main
+}
 FILES:
 {
     0
@@ -36,4 +41,14 @@ FILES:
     Main/stupid
     c======
     hahahahhahahahahahahhaha
+}
+{
+    3
+    test.cod
+    Main
+    c======
+    var text = "Hello World!"
+    while true
+      out text
+    ;
 }

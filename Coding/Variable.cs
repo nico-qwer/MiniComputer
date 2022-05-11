@@ -9,9 +9,10 @@ namespace MiniComputer
         public string type { get; private set; }
         public string value;
 
-        public Variable(string newName, string newValue)
+        public Variable(string newName, string[] newValues)
         {
             name = newName;
+            string newValue = Interpreter.GetString(newValues);
 
             //Negativity Removal
             string absValue = newValue;
@@ -32,14 +33,9 @@ namespace MiniComputer
                 type = "bool";
             }
             //String default
-            else if (newValue.StartsWith('"') && newValue.EndsWith('"'))
-            {
-                type = "string";
-                newValue = newValue.Substring(1, newValue.Length - 2);
-            }
             else
             {
-                type = "invalid";
+                type = "string";
             }
 
             value = newValue;

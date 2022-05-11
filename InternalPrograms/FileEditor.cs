@@ -45,12 +45,6 @@ namespace MiniComputer
                     case ConsoleKey.Q:
                         exit = true;
 
-                        for (int i = Globals.openFile.content.Count() - 1; i >= 0; i--)
-                        {
-                            if (Globals.openFile.content[i] == "") Globals.openFile.content.RemoveAt(i);
-                            else break;
-                        }
-
                         break;
 
                     case ConsoleKey.Enter:
@@ -58,13 +52,15 @@ namespace MiniComputer
                         break;
 
                     case ConsoleKey.N:
-                        Globals.openFile.content.Add("");
+                        Globals.openFile.content.Insert(selectedLine + 1, "");
+                        selectedLine++;
                         break;
 
                     case ConsoleKey.Backspace:
                         if (Globals.openFile.content.Count() > 1)
                         {
-                            Globals.openFile.content.RemoveAt(Globals.openFile.content.Count - 1);
+                            Globals.openFile.content.RemoveAt(selectedLine);
+                            selectedLine--;
                         }
                         break;
 
@@ -113,6 +109,7 @@ namespace MiniComputer
                     case ConsoleKey.Backspace:
                         if (charCount == 0) continue;
 
+                        if (insertChar - 1 < 0) continue;
                         newLine = newLine.Remove(insertChar - 1, 1);
 
                         charCount--;
@@ -128,13 +125,13 @@ namespace MiniComputer
 
                     case ConsoleKey.LeftArrow:
 
-                        if (Console.CursorLeft <= line.ToString().Length + 4) continue;
+                        if (Console.CursorLeft <= line.ToString().Length + 1) continue;
                         Console.CursorLeft = Console.CursorLeft - 1;
                         insertChar--;
                         break;
 
                     case ConsoleKey.RightArrow:
-                        if (Console.CursorLeft >= line.ToString().Length + 4 + newLine.Length - 1) continue;
+                        if (Console.CursorLeft >= line.ToString().Length + 2 + newLine.Length - 1) continue;
                         Console.CursorLeft = Console.CursorLeft + 1;
                         insertChar++;
                         break;
@@ -173,9 +170,9 @@ namespace MiniComputer
             Write(new string(' ', BufferWidth));
             CursorTop = CursorTop - 1;
 
-            Write(line + " | ");
+            Write(line + "|");
             Write(text);
-            CursorLeft = cursor + line.ToString().Length + 4;
+            CursorLeft = cursor + line.ToString().Length + 2;
         }
 
         static void Refresh()
@@ -190,20 +187,17 @@ namespace MiniComputer
             for (int i = 0; i < Globals.openFile.content.Count(); i++)
             {
                 string number = i.ToString();
-                int digits = (int)Math.Floor(Math.Log10(Globals.openFile.content.Count()) + 1);
+                int filelenght = Globals.openFile.content.Count() - 1;
+                int digits = filelenght.ToString().Length;
 
-                for (int j = 0; j < digits - number.Length; j++)
-                {
-                    number += " ";
-                }
-                number += "| ";
+                number = number.PadLeft(digits);
+                number += "|";
 
                 writen = true;
 
                 if (selectedLine == i)
                 {
                     WriteSelected(number + Globals.openFile.content[i]);
-
                 }
                 else
                 {
@@ -213,7 +207,7 @@ namespace MiniComputer
 
             if (writen == false)
             {
-                Write("0 | ");
+                Write("0|");
             }
         }
     }
