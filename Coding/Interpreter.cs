@@ -1,5 +1,6 @@
 using System;
 using static System.Console;
+using System.Data;
 
 namespace MiniComputer
 {
@@ -40,16 +41,16 @@ namespace MiniComputer
                 {
                     //Variable Creation
                     case "var":
-                        if (tokens[1] == null || tokens[1] == "") { Globals.WriteError($"{line}: Variable must have name."); return; }
+                        if (tokens.Length < 5) { Globals.WriteError("Variable is missing arguments."); return; }
 
-                        if (tokens[2] != "=" && tokens[3] == null || tokens[3] == "") { Globals.WriteError($"{line}: Variable must be assigned to."); return; }
+                        if (tokens[3] != "=") { Globals.WriteError($"{line}: Variable must be assigned to."); return; }
 
                         for (int j = 0; j < variables.Count(); j++)
                         {
-                            if (variables[j].name == tokens[1]) { Globals.WriteError($"{line}: Variable already declared."); return; }
+                            if (variables[j].name == tokens[3]) { Globals.WriteError($"{line}: Variable already declared."); return; }
                         }
 
-                        Variable newVariable = new Variable(tokens[1], tokens.Skip(3).ToArray());
+                        Variable newVariable = new Variable(tokens[2], tokens[1], tokens.Skip(4).ToArray());
 
                         if (newVariable.type == "invalid")
                         {
@@ -77,8 +78,6 @@ namespace MiniComputer
 
                     case "while":
                         if (tokens.Length <= 1) { Globals.WriteError($"{line}: Arguments missing."); break; }
-
-                        WriteLine("Hey!");
 
                         bool? valueW = isTrue(tokens);
                         if (valueW == null) { Globals.WriteError($"{line}: Condition invalid."); break; }
@@ -181,9 +180,9 @@ namespace MiniComputer
             }
         }
 
-        public static string GetString(string[] toGetFrom)
+        public static string? GetString(string[] toGetFrom)
         {
-            string output = "";
+            string? output = null;
             string newString = "";
 
             if (toGetFrom.Length == 0) return output;
@@ -194,10 +193,12 @@ namespace MiniComputer
                 {
                     Variable? refVar = GetVariable(toGetFrom[i].Remove(0, 1));
                     if (refVar == null) continue;
+                    if (output == null) output = "";
                     output += refVar.value;
                 }
                 else if (newString == string.Empty && toGetFrom[i] == "get()")
                 {
+                    if (output == null) output = "";
                     output += GetInput();
                 }
                 else if (toGetFrom[i].StartsWith('"'))
@@ -207,14 +208,102 @@ namespace MiniComputer
                 }
                 else if (newString != string.Empty)
                 {
-                    if (toGetFrom[i].EndsWith('"')) { output += newString + " " + toGetFrom[i].Remove(toGetFrom[i].Length - 1, 1); newString = ""; }
+                    if (toGetFrom[i].EndsWith('"'))
+                    {
+                        if (output == null) output = "";
+                        output += newString + " " + toGetFrom[i].Remove(toGetFrom[i].Length - 1, 1);
+                        newString = "";
+                    }
                     else newString += " " + toGetFrom[i];
                 }
             }
 
-            if (output == string.Empty) Globals.WriteError("String is empty");
+            if (output == null) Globals.WriteError("String is empty");
             return output;
         }
 
+        public static float? GetFloat(string[] toGetFrom)
+        {
+            string? output = null;
+
+            if (toGetFrom.Length == 0) return null;
+
+            for (int i = 0; i < toGetFrom.Length; i++)
+            {
+                if (toGetFrom[i].StartsWith('$'))
+                {
+                    Variable? refVar = GetVariable(toGetFrom[i].Remove(0, 1));
+                    if (refVar == null) continue;
+                    if (output == null) output = "";
+                    output += refVar.value;
+                }
+                else if (toGetFrom[i] == "get()")
+                {
+                    if (output == null) output = "";
+                    output += GetInput();
+                }
+                else if (float.TryParse(toGetFrom[i], out float newNum))
+                {
+                    output += newNum;
+                }
+                else
+                {
+                    output += toGetFrom[i];
+                }
+            }
+
+            if (output == null) { Globals.WriteError($"{line}: Float in null."); return null; }
+
+            float floOut = ComputeFloat(output);
+
+            if (output == null) Globals.WriteError($"{line}: Float in null.");
+
+            return floOut;
+        }
+
+        public static int? GetInt(string[] toGetFrom)
+        {
+            string? output = null;
+
+            if (toGetFrom.Length == 0) return null;
+
+            for (int i = 0; i < toGetFrom.Length; i++)
+            {
+                if (toGetFrom[i].StartsWith('$'))
+                {
+                    Variable? refVar = GetVariable(toGetFrom[i].Remove(0, 1));
+                    if (refVar == null) continue;
+                    if (output == null) output = "";
+                    output += refVar.value;
+                }
+                else if (toGetFrom[i] == "get()")
+                {
+                    if (output == null) output = "";
+                    output += GetInput();
+                }
+                else if (float.TryParse(toGetFrom[i], out float newNum))
+                {
+                    output += newNum;
+                }
+                else
+                {
+                    output += toGetFrom[i];
+                }
+            }
+
+            if (output == null) { Globals.WriteError($"{line}: Int in null."); return null; }
+
+            int intOut = (int)ComputeFloat(output);
+
+            if (output == null) Globals.WriteError($"{line}: Int in null.");
+
+            return intOut;
+        }
+
+        static float ComputeFloat(string input)
+        {
+            DataTable dt = new DataTable();
+            return (float)dt.Compute(input, "");
+        }
     }
 }

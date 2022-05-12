@@ -9,36 +9,45 @@ namespace MiniComputer
         public string type { get; private set; }
         public string value;
 
-        public Variable(string newName, string[] newValues)
+        public Variable(string newName, string newtype, string[] newValues)
         {
             name = newName;
-            string newValue = Interpreter.GetString(newValues);
+            type = newtype;
+            string? newStrValue = Interpreter.GetString(newValues);
+            int? newIntValue = Interpreter.GetInt(newValues);
+            float? newFloatValue = Interpreter.GetFloat(newValues);
 
-            //Negativity Removal
-            string absValue = newValue;
-            char[] valueChars = newValue.ToCharArray();
-            if (valueChars[0] == '-')
+            //Float test
+            if (newFloatValue != null)
             {
-                absValue.Remove(0, 1);
+                type = "float";
+                if (newFloatValue != null) { float nonNull = (float)newFloatValue; value = nonNull.ToString(); }
+                else { type = "invalid"; value = "null"; }
             }
-
             //Int test
-            if (float.TryParse(newValue, out _) || float.TryParse(newValue.Replace('.', ','), out _))
+            else if (newIntValue != null)
             {
-                type = "number";
+                type = "int";
+                if (newIntValue != null) { float nonNull = (float)newIntValue; value = nonNull.ToString(); }
+                else { type = "invalid"; value = "null"; }
             }
             //Bool test
-            else if (newValue == "true" || newValue == "false")
+            else if (newValues[0] == "true" || newValues[0] == "false")
             {
                 type = "bool";
+                value = newValues[0];
             }
-            //String default
-            else
+            //String test
+            else if (newStrValue != null)
             {
                 type = "string";
+                value = newStrValue;
             }
-
-            value = newValue;
+            else
+            {
+                type = "invalid";
+                value = "null";
+            }
         }
     }
 }
